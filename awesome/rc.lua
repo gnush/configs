@@ -1,3 +1,5 @@
+-- for 3.4.10
+
 -- Standard awesome library
 require("awful")
 require("awful.autofocus")
@@ -77,66 +79,9 @@ mytextclock = awful.widget.textclock({ align = "right" })
 mybatmon = widget({ type = "textbox", name = "mybatmon", align = "right"})
 --myalsa = widget({ type = "textbox", name = "myalsa", align = "right" })
 mywifi = widget({ type = "textbox", name = "mywifi", align = "right" })
+-- mywifi = awful.widget.textbox()
 
-function battery_charge()
-    local fbat  = io.open("/sys/class/power_supply/BAT0/present")
-    local fmax  = io.open("/sys/class/power_supply/BAT0/charge_full")
-    local fnow  = io.open("/sys/class/power_supply/BAT0/charge_now")
-    local fsta  = io.open("/sys/class/power_supply/BAT0/status")
 
-    local out   = ""
-
-    if fbat ~= nil then
-        local max = fmax:read()
-        local now = fnow:read()
-        local sta = fsta:read()
-        fmax:close()
-        fnow:close()
-        fsta:close()
-
-        if sta:match("Discharging") then
-            out = "[Bat↓ " .. math.floor(tonumber(now) * 100 / tonumber(max)) .. "%]"
-        elseif sta:match("Charging") then
-            out = "Bat↑ " .. math.floor(tonumber(now) * 100 / tonumber(max)) .. "%]"
-        else
-            out = "[A/C]"
-        end
-    else
-        out = "[A/C]"
-    end
-
-    return out
-end
-
-function wifi()
-    local flink = io.open("/sys/class/net/wlan0/wireless/link")
-
-    --local link = flink:read()
-    --flink:close()
-    local out = ""
-    if flink ~= nil then
-        local link = flink:read()
-        flink:close()
-        
-        if tonumber(link) <= 10 then
-            out = "[Wifi: D/C]"
-        else
-            out = "[Wifi: " .. link  .. "%]"
-        end
-    else
-        out = "[Wifi: N/A]"
-    end
-    return out
-end
-
--- reload widget text every x seconds ( x = 30 )
-mytimer = timer({ timeout = 10 })
-mytimer:add_signal("timeout",
-                    function()
-                        mybatmon.text = battery_charge()
-                        mywifi.text = wifi()
-                    end)
-mytimer:start()
 
 
 -- Create a systray
@@ -379,11 +324,11 @@ awful.rules.rules = {
     { rule = { class = "feh" },
         properties = { tiling = true,
                        tag = tags[1][5] } },
-    --Set Browsers to always map on tags number 2 of screen 1.
+    --Set Browsers to always map on tags number 2 of the biggest screen.
     { rule = { class = "Firefox" },
-        properties = { tag = tags[1][2] } },
+        properties = { tag = tags[screen.count()][2] } },
     { rule = { class = "Chromium" },
-        properties = { tag = tags[1][2] } },
+        properties = { tag = tags[screen.count()][2] } },
     { rule = { class = "Eclipse" },
         properties = { tag = tags[1][4] } },
     { rule = { class = "gracket" },
@@ -423,3 +368,66 @@ end)
 client.add_signal("focus", function(c) c.border_color = beautiful.border_focus end)
 client.add_signal("unfocus", function(c) c.border_color = beautiful.border_normal end)
 -- }}}
+
+-- timer
+mytimer = timer({ timeout = 1 })
+mytimer:add_signal("timeout",
+                    function()
+                        mybatmon.text = battery_charge()
+                        mywifi.text = wifi()
+                    end)
+mytimer:start()
+
+
+-- some functions
+
+function battery_charge()
+    local fbat  = io.open("/sys/class/power_supply/BAT0/present")
+    local fmax  = io.open("/sys/class/power_supply/BAT0/charge_full")
+    local fnow  = io.open("/sys/class/power_supply/BAT0/charge_now")
+    local fsta  = io.open("/sys/class/power_supply/BAT0/status")
+
+    local out   = ""
+
+    if fbat ~= nil then
+        local max = fmax:read()
+        local now = fnow:read()
+        local sta = fsta:read()
+        fmax:close()
+        fnow:close()
+        fsta:close()
+
+        if sta:match("Discharging") then
+            out = "[Bat↓ " .. math.floor(tonumber(now) * 100 / tonumber(max)) .. "%]"
+        elseif sta:match("Charging") then
+            out = "[Bat↑ " .. math.floor(tonumber(now) * 100 / tonumber(max)) .. "%]"
+        else
+            out = "[A/C]"
+        end
+    else
+        out = "[A/C]"
+    end
+
+    return out
+end
+
+function wifi()
+    local flink = io.open("/sys/class/net/wlan0/wireless/link")
+
+    --local link = flink:read()
+    --flink:close()
+    local out = ""
+    if flink ~= nil then
+        local link = flink:read()
+        flink:close()
+        
+        if tonumber(link) <= 10 then
+            out = "[Wifi: D/C]"
+        else
+            out = "[Wifi: " .. link  .. "%]"
+        end
+    else
+        out = "[Wifi: N/A]"
+    end
+    return out
+end

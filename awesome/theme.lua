@@ -2,7 +2,7 @@
 --  "Zenburn" awesome theme  --
 --    By Adrian C. (anrxc)   --
 -------------------------------
--- modified by raven
+-- modified by gnush
 -------------------------------
 
 -- Alternative icon sets and widget icons:

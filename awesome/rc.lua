@@ -1,5 +1,3 @@
--- for awesome 3.4.8 (Never Know)
-
 -- Standard awesome library
 require("awful")
 require("awful.autofocus")
@@ -49,7 +47,7 @@ layouts =
 tags = {}
 for s = 1, screen.count() do
     -- Each screen has its own tag table.
-    tags[s] = awful.tag({ "term", "www", "chat", "dev", "misc" }, s, awful.layout.suit.tile)
+    tags[s] = awful.tag({ "term", "www", "chat", "dev", "misc" }, s, layouts[2])
 end
 -- }}}
 
@@ -120,7 +118,7 @@ function wifi()
         local link = flink:read()
         flink:close()
         
-        if tonumber(link) <= tonumber("10") then
+        if tonumber(link) <= 10 then
             out = "[Wifi: D/C]"
         else
             out = "[Wifi: " .. link  .. "%]"
@@ -132,10 +130,14 @@ function wifi()
 end
 
 -- reload widget text every x seconds ( x = 30 )
-awful.hooks.timer.register(30, function()
-        mybatmon.text = battery_charge()
-        mywifi.text = wifi()
-end)
+mytimer = timer({ timeout = 10 })
+mytimer:add_signal("timeout",
+                    function()
+                        mybatmon.text = battery_charge()
+                        mywifi.text = wifi()
+                    end)
+mytimer:start()
+
 
 -- Create a systray
 mysystray = widget({ type = "systray" })

@@ -1,17 +1,18 @@
--------------------------------
---  "Zenburn" awesome theme  --
---    By Adrian C. (anrxc)   --
--------------------------------
--- modified by gnush
--------------------------------
+-----------------------------------
+--  "dark-orange" awesome theme  --
+--          By gnush.            --
+-----------------------------------
+--  initially based on "Zenburn" --
+--      By Adrian C. (anrxc)     --
+-----------------------------------
 
 -- Alternative icon sets and widget icons:
 --  * http://awesome.naquadah.org/wiki/Nice_Icons
 
 -- {{{ Main
 theme = {}
---theme.wallpaper_cmd = { "awsetbg /usr/share/awesome/themes/zenburn/zenburn-background.png" }
---theme.wallpaper_cmd = { "awsetbg /home/raven/wallpaper/goombadooma.png" }
+-- i use .xinitrc to set up a wallpaper, so this is not necessary
+--theme.wallpaper_cmd = { "awsetbg /..." }
 -- }}}
 
 -- {{{ Styles

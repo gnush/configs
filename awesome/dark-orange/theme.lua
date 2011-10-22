@@ -86,7 +86,7 @@ theme.taglist_squares_unsel = themeDir .. "/taglist/squarez.png"
 -- {{{ Misc
 theme.awesome_icon           = themeDir .. "/awesome-icon.png"
 theme.menu_submenu_icon      = themeDir .. "/submenu.png"
-theme.tasklist_floating_icon = themeDir .. "/tasklist/floatingw.png"
+theme.tasklist_floating_icon = themeDir .. "/floatingw.png"
 -- }}}
 
 -- {{{ Layout

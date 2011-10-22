@@ -12,7 +12,8 @@ require("naughty")
 -- {{{ Variable definitions
 -- Themes define colours, icons, and wallpapers
 --beautiful.init("/usr/share/awesome/themes/default/theme.lua")
-beautiful.init("/usr/share/awesome/themes/own/theme.lua")
+--beautiful.init("/usr/share/awesome/themes/own/theme.lua")
+beautiful.init(awful.util.getdir("config") .. "/themes/dark-orange/theme.lua")
 
 -- This is used later as the default terminal and editor to run.
 terminal = "urxvtc"
@@ -179,9 +180,23 @@ root.buttons(awful.util.table.join(
 
 globalkeys = awful.util.table.join(
 -- {{ dmenu
-awful.key({modkey }, "p", function()
-  awful.util.spawn_with_shell( "exe=`dmenu_run -i -nf '#f0dfaf' -nb '#1e2320' -sf '#f5a400' -sb '#1e2320'` && exec $exe")
-end),
+    awful.key({modkey }, "p", function()
+        awful.util.spawn_with_shell( "exe=`dmenu_run -i -nf '#f0dfaf' -nb '#1e2320' -sf '#f5a400' -sb '#1e2320'` && exec $exe")
+    end),
+    
+    -- moc keybindings
+    awful.key({ modkey, }, "n", function()
+                                    awful.util.spawn("mocp -f")
+
+                                    local mocp = io.popen("mocp -Q '%artist - %song\n(%album)'")
+                                    local s = ""
+
+                                    for l in mocp:lines() do
+                                        s = s .. l .. "\n"
+                                    end
+
+                                    naughty.notify({text=s})
+                                end),
 
     awful.key({ modkey,           }, "Left",   awful.tag.viewprev       ),
     awful.key({ modkey,           }, "Right",  awful.tag.viewnext       ),
@@ -247,7 +262,7 @@ clientkeys = awful.util.table.join(
     awful.key({ modkey,           }, "o",      awful.client.movetoscreen                        ),
     awful.key({ modkey, "Shift"   }, "r",      function (c) c:redraw()                       end),
     awful.key({ modkey,           }, "t",      function (c) c.ontop = not c.ontop            end),
-    awful.key({ modkey,           }, "n",      function (c) c.minimized = not c.minimized    end),
+--    awful.key({ modkey,           }, "n",      function (c) c.minimized = not c.minimized    end),
     awful.key({ modkey,           }, "m",
         function (c)
             c.maximized_horizontal = not c.maximized_horizontal

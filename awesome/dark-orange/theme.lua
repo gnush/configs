@@ -1,17 +1,18 @@
--------------------------------
---  "Zenburn" awesome theme  --
---    By Adrian C. (anrxc)   --
--------------------------------
--- modified by raven
--------------------------------
+-----------------------------------
+--  "dark-orange" awesome theme  --
+--          By gnush.            --
+-----------------------------------
+--  initially based on "Zenburn" --
+--      By Adrian C. (anrxc)     --
+-----------------------------------
 
 -- Alternative icon sets and widget icons:
 --  * http://awesome.naquadah.org/wiki/Nice_Icons
 
 -- {{{ Main
 theme = {}
---theme.wallpaper_cmd = { "awsetbg /usr/share/awesome/themes/zenburn/zenburn-background.png" }
---theme.wallpaper_cmd = { "awsetbg /home/raven/wallpaper/goombadooma.png" }
+-- i use .xinitrc to set up a wallpaper, so this is not necessary
+--theme.wallpaper_cmd = { "awsetbg /..." }
 -- }}}
 
 -- {{{ Styles
@@ -22,7 +23,7 @@ theme.fg_normal = "#f0dfaf"
 theme.fg_focus  = "#f4bf07"
 theme.fg_urgent = "#ff0000"
 theme.bg_normal = "#1e2320"
-theme.bg_focus  = "#1E2320"
+theme.bg_focus  = "#1e2320"
 theme.bg_urgent = "#1e2320"
 -- }}}
 
@@ -72,57 +73,60 @@ theme.menu_height = "15"
 theme.menu_width  = "100"
 -- }}}
 
+-- for a global installation use /usr/share/awesome (or whoever you have put it)
+themeDir = awful.util.getdir("config") .. "/themes/dark-orange"
+
 -- {{{ Icons
 -- {{{ Taglist
-theme.taglist_squares_sel   = "/usr/share/awesome/themes/own/taglist/squarefz.png"
-theme.taglist_squares_unsel = "/usr/share/awesome/themes/own/taglist/squarez.png"
+theme.taglist_squares_sel   = themeDir .. "/taglist/squarefz.png"
+theme.taglist_squares_unsel = themeDir .. "/taglist/squarez.png"
 --theme.taglist_squares_resize = "false"
 -- }}}
 
 -- {{{ Misc
-theme.awesome_icon           = "/usr/share/awesome/themes/own/awesome-icon.png"
-theme.menu_submenu_icon      = "/usr/share/awesome/themes/default/submenu.png"
-theme.tasklist_floating_icon = "/usr/share/awesome/themes/default/tasklist/floatingw.png"
+theme.awesome_icon           = themeDir .. "/awesome-icon.png"
+theme.menu_submenu_icon      = themeDir .. "/submenu.png"
+theme.tasklist_floating_icon = themeDir .. "/tasklist/floatingw.png"
 -- }}}
 
 -- {{{ Layout
-theme.layout_tile       = "/usr/share/awesome/themes/own/layouts/tile.png"
-theme.layout_tileleft   = "/usr/share/awesome/themes/own/layouts/tileleft.png"
-theme.layout_tilebottom = "/usr/share/awesome/themes/own/layouts/tilebottom.png"
-theme.layout_tiletop    = "/usr/share/awesome/themes/own/layouts/tiletop.png"
-theme.layout_fairv      = "/usr/share/awesome/themes/own/layouts/fairv.png"
-theme.layout_fairh      = "/usr/share/awesome/themes/own/layouts/fairh.png"
-theme.layout_spiral     = "/usr/share/awesome/themes/own/layouts/spiral.png"
-theme.layout_dwindle    = "/usr/share/awesome/themes/own/layouts/dwindle.png"
-theme.layout_max        = "/usr/share/awesome/themes/own/layouts/max.png"
-theme.layout_fullscreen = "/usr/share/awesome/themes/own/layouts/fullscreen.png"
-theme.layout_magnifier  = "/usr/share/awesome/themes/own/layouts/magnifier.png"
-theme.layout_floating   = "/usr/share/awesome/themes/own/layouts/floating.png"
+theme.layout_tile       = themeDir .. "/layouts/tile.png"
+theme.layout_tileleft   = themeDir .. "/layouts/tileleft.png"
+theme.layout_tilebottom = themeDir .. "/layouts/tilebottom.png"
+theme.layout_tiletop    = themeDir .. "/layouts/tiletop.png"
+theme.layout_fairv      = themeDir .. "/layouts/fairv.png"
+theme.layout_fairh      = themeDir .. "/layouts/fairh.png"
+theme.layout_spiral     = themeDir .. "/layouts/spiral.png"
+theme.layout_dwindle    = themeDir .. "/layouts/dwindle.png"
+theme.layout_max        = themeDir .. "/layouts/max.png"
+theme.layout_fullscreen = themeDir .. "/layouts/fullscreen.png"
+theme.layout_magnifier  = themeDir .. "/layouts/magnifier.png"
+theme.layout_floating   = themeDir .. "/layouts/floating.png"
 -- }}}
 
 -- {{{ Titlebar
-theme.titlebar_close_button_focus  = "/usr/share/awesome/themes/zenburn/titlebar/close_focus.png"
-theme.titlebar_close_button_normal = "/usr/share/awesome/themes/zenburn/titlebar/close_normal.png"
+theme.titlebar_close_button_focus  = themeDir .. "/titlebar/close_focus.png"
+theme.titlebar_close_button_normal = themeDir .. "/titlebar/close_normal.png"
 
-theme.titlebar_ontop_button_focus_active  = "/usr/share/awesome/themes/zenburn/titlebar/ontop_focus_active.png"
-theme.titlebar_ontop_button_normal_active = "/usr/share/awesome/themes/zenburn/titlebar/ontop_normal_active.png"
-theme.titlebar_ontop_button_focus_inactive  = "/usr/share/awesome/themes/zenburn/titlebar/ontop_focus_inactive.png"
-theme.titlebar_ontop_button_normal_inactive = "/usr/share/awesome/themes/zenburn/titlebar/ontop_normal_inactive.png"
+theme.titlebar_ontop_button_focus_active  = themeDir .. "/titlebar/ontop_focus_active.png"
+theme.titlebar_ontop_button_normal_active = themeDir .. "/titlebar/ontop_normal_active.png"
+theme.titlebar_ontop_button_focus_inactive  = themeDir .. "/titlebar/ontop_focus_inactive.png"
+theme.titlebar_ontop_button_normal_inactive = themeDir .. "/titlebar/ontop_normal_inactive.png"
 
-theme.titlebar_sticky_button_focus_active  = "/usr/share/awesome/themes/zenburn/titlebar/sticky_focus_active.png"
-theme.titlebar_sticky_button_normal_active = "/usr/share/awesome/themes/zenburn/titlebar/sticky_normal_active.png"
-theme.titlebar_sticky_button_focus_inactive  = "/usr/share/awesome/themes/zenburn/titlebar/sticky_focus_inactive.png"
-theme.titlebar_sticky_button_normal_inactive = "/usr/share/awesome/themes/zenburn/titlebar/sticky_normal_inactive.png"
+theme.titlebar_sticky_button_focus_active  = themeDir .. "/titlebar/sticky_focus_active.png"
+theme.titlebar_sticky_button_normal_active = themeDir .. "/titlebar/sticky_normal_active.png"
+theme.titlebar_sticky_button_focus_inactive  = themeDir .. "/titlebar/sticky_focus_inactive.png"
+theme.titlebar_sticky_button_normal_inactive = themeDir .. "/titlebar/sticky_normal_inactive.png"
 
-theme.titlebar_floating_button_focus_active  = "/usr/share/awesome/themes/zenburn/titlebar/floating_focus_active.png"
-theme.titlebar_floating_button_normal_active = "/usr/share/awesome/themes/zenburn/titlebar/floating_normal_active.png"
-theme.titlebar_floating_button_focus_inactive  = "/usr/share/awesome/themes/zenburn/titlebar/floating_focus_inactive.png"
-theme.titlebar_floating_button_normal_inactive = "/usr/share/awesome/themes/zenburn/titlebar/floating_normal_inactive.png"
+theme.titlebar_floating_button_focus_active  = themeDir .. "/titlebar/floating_focus_active.png"
+theme.titlebar_floating_button_normal_active = themeDir .. "/titlebar/floating_normal_active.png"
+theme.titlebar_floating_button_focus_inactive  = themeDir .. "/titlebar/floating_focus_inactive.png"
+theme.titlebar_floating_button_normal_inactive = themeDir .. "/titlebar/floating_normal_inactive.png"
 
-theme.titlebar_maximized_button_focus_active  = "/usr/share/awesome/themes/zenburn/titlebar/maximized_focus_active.png"
-theme.titlebar_maximized_button_normal_active = "/usr/share/awesome/themes/zenburn/titlebar/maximized_normal_active.png"
-theme.titlebar_maximized_button_focus_inactive  = "/usr/share/awesome/themes/zenburn/titlebar/maximized_focus_inactive.png"
-theme.titlebar_maximized_button_normal_inactive = "/usr/share/awesome/themes/zenburn/titlebar/maximized_normal_inactive.png"
+theme.titlebar_maximized_button_focus_active  = themeDir .. "/titlebar/maximized_focus_active.png"
+theme.titlebar_maximized_button_normal_active = themeDir .. "/titlebar/maximized_normal_active.png"
+theme.titlebar_maximized_button_focus_inactive  = themeDir .. "/titlebar/maximized_focus_inactive.png"
+theme.titlebar_maximized_button_normal_inactive = themeDir .. "/titlebar/maximized_normal_inactive.png"
 -- }}}
 -- }}}
 

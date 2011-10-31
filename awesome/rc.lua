@@ -344,12 +344,14 @@ awful.rules.rules = {
         properties = { tag = tags[screen.count()][2] } },
     { rule = { class = "Chromium" },
         properties = { tag = tags[screen.count()][2] } },
+    { rule= { class = "sun-awt-X11-XFramePeer" },
+        properties = { tag = tags[screen.count()][4] },
     { rule = { class = "Eclipse" },
-        properties = { tag = tags[1][4] } },
+        properties = { tag = tags[screen.count()][4] } },
     { rule = { class = "gracket" },
-        properties = { tag = tags[1][4] } },
+        properties = { tag = tags[screen.count()][4] } },
     { rule = { class = "Vlc" },
-        properties = { tag = tags[1][5] } }
+        properties = { tag = tags[screen.count()][5] } }
 }
 -- }}}
 
@@ -385,7 +387,7 @@ client.add_signal("unfocus", function(c) c.border_color = beautiful.border_norma
 -- }}}
 
 -- timer
-mytimer = timer({ timeout = 1 })
+mytimer = timer({ timeout = 15 })
 mytimer:add_signal("timeout",
                     function()
                         mybatmon.text = battery_charge()

@@ -186,7 +186,7 @@ globalkeys = awful.util.table.join(
     
     -- moc keybindings
     awful.key({ modkey, }, "n", function()
-                                    awful.util.spawn("mocp -f")
+                                    os.execute("mocp -f")
 
                                     local mocp = io.popen("mocp -Q '%artist - %song\n(%album)'")
                                     local s = ""
@@ -338,14 +338,12 @@ awful.rules.rules = {
         properties = { floating = true } },
     { rule = { class = "feh" },
         properties = { tiling = true,
-                       tag = tags[1][5] } },
+                       tag = tags[screen.count()][5] } },
     --Set Browsers to always map on tags number 2 of the biggest screen.
     { rule = { class = "Firefox" },
         properties = { tag = tags[screen.count()][2] } },
     { rule = { class = "Chromium" },
         properties = { tag = tags[screen.count()][2] } },
-    { rule= { class = "sun-awt-X11-XFramePeer" },
-        properties = { tag = tags[screen.count()][4] },
     { rule = { class = "Eclipse" },
         properties = { tag = tags[screen.count()][4] } },
     { rule = { class = "gracket" },

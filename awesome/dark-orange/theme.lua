@@ -14,6 +14,9 @@ theme = {}
 -- i use .xinitrc to set up a wallpaper, so this is not necessary
 --theme.wallpaper_cmd = { "awsetbg /..." }
 -- }}}
+-- nasty fix for a bug in awesome 3.4.11
+-- see http://awesome.naquadah.org/wiki/Awesome_3.3_to_3.4 for additional information about
+theme.wallpaper_cmd = { 42 }
 
 -- {{{ Styles
 theme.font      = "sans 8"

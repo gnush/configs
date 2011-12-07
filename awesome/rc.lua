@@ -11,7 +11,6 @@ require("naughty")
 
 -- {{{ Variable definitions
 -- Themes define colours, icons, and wallpapers
---beautiful.init("/usr/share/awesome/themes/default/theme.lua")
 --beautiful.init("/usr/share/awesome/themes/own/theme.lua")
 beautiful.init(awful.util.getdir("config") .. "/themes/dark-orange/theme.lua")
 

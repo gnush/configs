@@ -1,0 +1,35 @@
+Xcursor.theme           : Neutral
+
+Xft.dpi                 : 96
+Xft.antialias           : true
+Xft.hinting             : true
+
+#urxvt.font              : xft:inconsolata:pixelsize=16
+urxvt.font              : xft:terminus:pixelsize=14
+urxvt.foreground        : #d2d2d2
+urxvt.background        : #1b1d1e
+urxvt.cursorcolor       : #ffffff
+# underlined
+urxvt.colorBD           : #8ac6f2
+# bold
+urxvt.colorUL           : #95e454
+urxvt.urgentOnBell      : true
+urxvt.internalBorder    : 2
+urxvt.saveLines         : 32767
+# für epileptiker
+urxvt.visualBell        : false
+urxvt.jumpscroll        : false
+urxvt.scrollBar         : false
+urxvt.scrollTtyKeypress : true
+urxvt.scrollWithBuffer  : false
+urxvt.scrollTtyOutput   : false
+urxvt.utmpInhibit       : true
+urxvt.urlLauncher       : firefox
+urxvt.matcher.button    : 1
+urxvt.perl-ext-common   : default,matcher
+urxvt.matcher.pattern.1 : \\bww\\.[\\w-]\\.[\\w./?&@#-]*[\\w/-]
+urxvt.depth             : 24
+urxvt.transparent       : false
+urxvt.fading            : 25%
+urxvt.shading           : -2
+urxvt.metaSendEscape    : true

@@ -186,6 +186,7 @@ globalkeys = awful.util.table.join(
     -- moc keybindings
     awful.key({ modkey, }, "n", function()
                                     os.execute("mocp -f")
+                                    --awful.util.spawn_with_shell("mocp -f")
 
                                     local mocp = io.popen("mocp -Q '%artist - %song\n(%album)'")
                                     local s = ""

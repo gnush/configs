@@ -14,6 +14,9 @@ theme = {}
 -- i use .xinitrc to set up a wallpaper, so this is not necessary
 --theme.wallpaper_cmd = { "awsetbg /..." }
 -- }}}
+-- nasty fix for a bug in awesome 3.4.11
+-- see http://awesome.naquadah.org/wiki/Awesome_3.3_to_3.4 for additional information about
+theme.wallpaper_cmd = { 42 }
 
 -- {{{ Styles
 theme.font      = "sans 8"
@@ -86,7 +89,7 @@ theme.taglist_squares_unsel = themeDir .. "/taglist/squarez.png"
 -- {{{ Misc
 theme.awesome_icon           = themeDir .. "/awesome-icon.png"
 theme.menu_submenu_icon      = themeDir .. "/submenu.png"
-theme.tasklist_floating_icon = themeDir .. "/tasklist/floatingw.png"
+theme.tasklist_floating_icon = themeDir .. "/floatingw.png"
 -- }}}
 
 -- {{{ Layout

@@ -11,7 +11,6 @@ require("naughty")
 
 -- {{{ Variable definitions
 -- Themes define colours, icons, and wallpapers
---beautiful.init("/usr/share/awesome/themes/default/theme.lua")
 --beautiful.init("/usr/share/awesome/themes/own/theme.lua")
 beautiful.init(awful.util.getdir("config") .. "/themes/dark-orange/theme.lua")
 
@@ -186,7 +185,8 @@ globalkeys = awful.util.table.join(
     
     -- moc keybindings
     awful.key({ modkey, }, "n", function()
-                                    awful.util.spawn("mocp -f")
+                                    os.execute("mocp -f")
+                                    --awful.util.spawn_with_shell("mocp -f")
 
                                     local mocp = io.popen("mocp -Q '%artist - %song\n(%album)'")
                                     local s = ""
@@ -338,18 +338,18 @@ awful.rules.rules = {
         properties = { floating = true } },
     { rule = { class = "feh" },
         properties = { tiling = true,
-                       tag = tags[1][5] } },
+                       tag = tags[screen.count()][5] } },
     --Set Browsers to always map on tags number 2 of the biggest screen.
     { rule = { class = "Firefox" },
         properties = { tag = tags[screen.count()][2] } },
     { rule = { class = "Chromium" },
         properties = { tag = tags[screen.count()][2] } },
     { rule = { class = "Eclipse" },
-        properties = { tag = tags[1][4] } },
+        properties = { tag = tags[screen.count()][4] } },
     { rule = { class = "gracket" },
-        properties = { tag = tags[1][4] } },
+        properties = { tag = tags[screen.count()][4] } },
     { rule = { class = "Vlc" },
-        properties = { tag = tags[1][5] } }
+        properties = { tag = tags[screen.count()][5] } }
 }
 -- }}}
 
@@ -385,7 +385,7 @@ client.add_signal("unfocus", function(c) c.border_color = beautiful.border_norma
 -- }}}
 
 -- timer
-mytimer = timer({ timeout = 1 })
+mytimer = timer({ timeout = 15 })
 mytimer:add_signal("timeout",
                     function()
                         mybatmon.text = battery_charge()

@@ -439,7 +439,7 @@ function wifi()
         if tonumber(link) <= 10 then
             out = "[Wifi: D/C]"
         else
-            out = "[Wifi: " .. math.floor(70 * 100 / tonumber(link))  .. "%]"
+            out = "[Wifi: " .. math.floor(tonumber(link) * 100 / 70)  .. "%]"
         end
     else
         out = "[Wifi: N/A]"

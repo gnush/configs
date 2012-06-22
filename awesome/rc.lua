@@ -188,14 +188,14 @@ globalkeys = awful.util.table.join(
                                     os.execute("mocp -f")
                                     --awful.util.spawn_with_shell("mocp -f")
 
-                                    local mocp = io.popen("mocp -Q '%artist - %song\n(%album)'")
-                                    local s = ""
+                                    --local mocp = io.popen("mocp -Q '%artist - %song\n(%album)'")
+                                    --local s = ""
 
-                                    for l in mocp:lines() do
-                                        s = s .. l .. "\n"
-                                    end
+                                    --for l in mocp:lines() do
+                                    --    s = s .. l .. "\n"
+                                    --end
 
-                                    naughty.notify({text=s})
+                                    --naughty.notify({text=s})
                                 end),
 
     awful.key({ modkey,           }, "Left",   awful.tag.viewprev       ),

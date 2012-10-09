@@ -1,35 +1,67 @@
-Xcursor.theme           : Neutral
+Xcursor.theme                : Neutral
 
-Xft.dpi                 : 96
-Xft.antialias           : true
-Xft.hinting             : true
+Xft.dpi                      : 96
+Xft.antialias                : true
+Xft.hinting                  : full
 
-#urxvt.font              : xft:inconsolata:pixelsize=16
-urxvt.font              : xft:terminus:pixelsize=14
-urxvt.foreground        : #d2d2d2
-urxvt.background        : #1b1d1e
-urxvt.cursorcolor       : #ffffff
-# underlined
-urxvt.colorBD           : #8ac6f2
-# bold
-urxvt.colorUL           : #95e454
-urxvt.urgentOnBell      : true
-urxvt.internalBorder    : 2
-urxvt.saveLines         : 32767
-# für epileptiker
-urxvt.visualBell        : false
-urxvt.jumpscroll        : false
-urxvt.scrollBar         : false
-urxvt.scrollTtyKeypress : true
-urxvt.scrollWithBuffer  : false
-urxvt.scrollTtyOutput   : false
-urxvt.utmpInhibit       : true
-urxvt.urlLauncher       : firefox
-urxvt.matcher.button    : 1
-urxvt.perl-ext-common   : default,matcher
-urxvt.matcher.pattern.1 : \\bww\\.[\\w-]\\.[\\w./?&@#-]*[\\w/-]
-urxvt.depth             : 24
-urxvt.transparent       : false
-urxvt.fading            : 25%
-urxvt.shading           : -2
-urxvt.metaSendEscape    : true
+urxvt.font                   : xft:inconsolata:pixelsize=14,xft:terminus:pixelsize=13,xft:dejavu sans mono:pixelsize=13
+
+! Colors are from https://wiki.archlinux.org/index.php/Xdefaults#Terminal_colors
+urxvt.foreground             : #d2d2d2
+urxvt.background             : #1B1D1E
+urxvt.cursorColor            : #FFFFFF
+urxvt.colorUL                : #95e454
+urxvt.color0                 : #000000
+urxvt.color8                 : #555753
+urxvt.color1                 : #ff6565
+urxvt.color9                 : #ff8d8d
+urxvt.color2                 : #93d44f
+urxvt.color10                : #c8e7a8
+urxvt.color3                 : #eab93d
+urxvt.color11                : #ffc123
+urxvt.color4                 : #204a87
+urxvt.color12                : #3465a4
+urxvt.color5                 : #ff7f00
+urxvt.color13                : #f57900
+urxvt.color6                 : #89b6e2
+urxvt.color14                : #46a4ff
+urxvt.color7                 : #cccccc
+urxvt.color15                : #ffffff
+
+emacs.pointerColor           : #ffffff
+
+! To use urgency hints with console programms
+urxvt.urgentOnBell           : true
+
+urxvt.internalBorder         : 3
+urxvt.saveLines              : 32767
+urxvt.visualBell             : false
+urxvt.jumpScroll             : false
+
+! No scroll bar
+urxvt.scrollBar              : plain
+
+urxvt.scrollTtyKeypress      : true
+urxvt.scrollWithBuffer       : false
+urxvt.scrollTtyOutput        : false
+urxvt.secondaryScroll        : true
+urxvt.utmpInhibit            : true
+urxvt.urlLauncher            : firefox
+urxvt.matcher.button         : 1
+
+! Extension that matches URLs
+urxvt.perl-ext-common        : default,matcher
+
+urxvt.matcher.pattern.1      : \\bwww\\.[\\w-]\\.[\\w./?&@#-]*[\\w/-]
+
+! Charactes which bound the selection on double click
+urxvt.cutchars               : -
+
+urxvt.depth                  : 24
+urxvt.transparent            : false
+
+! If the window has no focus its faded out about 20%
+urxvt.fading                 : 20%
+
+urxvt.shading                : -2
+urxvt.metaSendsEscape        : true

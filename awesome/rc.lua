@@ -16,8 +16,11 @@ beautiful.init(awful.util.getdir("config") .. "/themes/dark-orange/theme.lua")
 
 -- This is used later as the default terminal and editor to run.
 terminal = "urxvtc"
-editor = os.getenv("EDITOR") or "nano"
+editor = os.getenv("EDITOR") or "vim"
 editor_cmd = terminal .. " -e " .. editor
+
+-- some vars
+local hostname = io.popen("cat /proc/sys/kernel/hostname")
 
 -- Default modkey.
 -- Usually, Mod4 is the key with a logo between Control and Alt.
@@ -77,12 +80,31 @@ mytextclock = awful.widget.textclock({ align = "right" })
 
 --Create battery, sound and wifi widget
 mybatmon = widget({ type = "textbox", name = "mybatmon", align = "right"})
---myalsa = widget({ type = "textbox", name = "myalsa", align = "right" })
 mywifi = widget({ type = "textbox", name = "mywifi", align = "right" })
+
+myvolman = widget({ type = "textbox", name = "myvolman", align = "right" })
+myvolman:buttons(awful.util.table.join(
+    awful.button({}, 1, function() volume("mute", myvolman) end),
+    awful.button({}, 4, function() volume("up", myvolman) end),
+    awful.button({}, 5, function() volume("down", myvolman) end)
+))
+
 -- mywifi = awful.widget.textbox()
 
+-- wifi widget with menu
+--mywifimenu = awful.menu({ items = { { "cased", vpn("cased") },
+--                                    { "hrz", vpn("hrz") }
+--                                  }
+--                        })
+--mywifi = awful.widget.launcher({ name="mywifi", align = "right", menu = mywifimenu })
 
+-- button widget test
+mybuttons = widget({ type = "textbox" })
+mybuttons.text = "doedel"
 
+mybuttons:buttons(awful.util.table.join(
+    awful.button({ }, 1, function () awful.util.spawn() end)
+))
 
 -- Create a systray
 mysystray = widget({ type = "systray" })
@@ -158,7 +180,9 @@ for s = 1, screen.count() do
         },
         mylayoutbox[s],
         mytextclock,
-        mybatmon,
+        hostname == "eee" and mybatmon or nil,
+        --mybuttons,
+        myvolman,
         mywifi,
         s == 1 and mysystray or nil,
         mytasklist[s],
@@ -251,7 +275,10 @@ globalkeys = awful.util.table.join(
                   mypromptbox[mouse.screen].widget,
                   awful.util.eval, nil,
                   awful.util.getdir("cache") .. "/history_eval")
-              end)
+              end),
+    awful.key({ }, "XF86AudioRaiseVolume",    function () volume("up", myvolman) end),
+    awful.key({ }, "XF86AudioLowerVolume",    function () volume("down", myvolman) end),
+    awful.key({ }, "XF86AudioMute",           function () volume("mute", myvolman) end)
 )
 
 clientkeys = awful.util.table.join(
@@ -319,6 +346,14 @@ root.keys(globalkeys)
 -- }}}
 
 -- {{{ Rules
+
+-- on laptops, use the extra plugged display
+if hostname == "eee" then
+    display = screen.count()
+else
+    display = 1
+end
+
 awful.rules.rules = {
     --disable hinting
     { rule = { },
@@ -329,6 +364,8 @@ awful.rules.rules = {
                      border_color = beautiful.border_normal,
                      focus = true,
                      keys = clientkeys,
+                     maximized_vertical   = false,
+                     maximized_horizontal = false,
                      buttons = clientbuttons } },
     { rule = { class = "MPlayer" },
         properties = { floating = true } },
@@ -338,18 +375,15 @@ awful.rules.rules = {
         properties = { floating = true } },
     { rule = { class = "feh" },
         properties = { tiling = true,
-                       tag = tags[screen.count()][5] } },
-    --Set Browsers to always map on tags number 2 of the biggest screen.
+                       tag = tags[display][5] } },
     { rule = { class = "Firefox" },
-        properties = { tag = tags[screen.count()][2] } },
+        properties = { tag = tags[display][2] } },
     { rule = { class = "Chromium" },
-        properties = { tag = tags[screen.count()][2] } },
+        properties = { tag = tags[display][2] } },
     { rule = { class = "Eclipse" },
-        properties = { tag = tags[screen.count()][4] } },
-    { rule = { class = "gracket" },
-        properties = { tag = tags[screen.count()][4] } },
+        properties = { tag = tags[display][4] } },
     { rule = { class = "Vlc" },
-        properties = { tag = tags[screen.count()][5] } }
+        properties = { tag = tags[display][5] } }
 }
 -- }}}
 
@@ -385,45 +419,49 @@ client.add_signal("unfocus", function(c) c.border_color = beautiful.border_norma
 -- }}}
 
 -- timer
-mytimer = timer({ timeout = 15 })
+mytimer = timer({ timeout = 2 })
 mytimer:add_signal("timeout",
                     function()
                         mybatmon.text = battery_charge()
                         mywifi.text = wifi()
+                        volume("update", myvolman)
                     end)
 mytimer:start()
 
 
 -- some functions
-
 function battery_charge()
-    local fbat  = io.open("/sys/class/power_supply/BAT0/present")
-    local fmax  = io.open("/sys/class/power_supply/BAT0/charge_full")
-    local fnow  = io.open("/sys/class/power_supply/BAT0/charge_now")
-    local fsta  = io.open("/sys/class/power_supply/BAT0/status")
+--    if hostname == "eee" then
+        local fbat  = io.open("/sys/class/power_supply/BAT0/present")
+        local fmax  = io.open("/sys/class/power_supply/BAT0/charge_full")
+        local fnow  = io.open("/sys/class/power_supply/BAT0/charge_now")
+        local fsta  = io.open("/sys/class/power_supply/BAT0/status")
 
-    local out   = ""
+        local out   = ""
 
-    if fbat ~= nil then
-        local max = fmax:read()
-        local now = fnow:read()
-        local sta = fsta:read()
-        fmax:close()
-        fnow:close()
-        fsta:close()
+        if fbat ~= nil then
+            local max = fmax:read()
+            local now = fnow:read()
+            local sta = fsta:read()
+            fmax:close()
+            fnow:close()
+            fsta:close()
 
-        if sta:match("Discharging") then
-            out = "[Bat↓ " .. math.floor(tonumber(now) * 100 / tonumber(max)) .. "%]"
-        elseif sta:match("Charging") then
-            out = "[Bat↑ " .. math.floor(tonumber(now) * 100 / tonumber(max)) .. "%]"
+            if sta:match("Discharging") then
+                out = "[Bat↓ " .. math.floor(tonumber(now) * 100 / tonumber(max)) .. "%]"
+            elseif sta:match("Charging") then
+                out = "[Bat↑ " .. math.floor(tonumber(now) * 100 / tonumber(max)) .. "%]"
+            else
+                out = "[A/C]"
+            end
         else
             out = "[A/C]"
         end
-    else
-        out = "[A/C]"
-    end
 
-    return out
+        return out
+--    else
+--        return ""
+--    end
 end
 
 function wifi()
@@ -445,4 +483,33 @@ function wifi()
         out = "[Wifi: N/A]"
     end
     return out
+end
+
+function volume(action, widget)
+    local channel = "Master"
+    local stat = ""
+    local vol =""
+
+    if action == "up" then
+        io.popen("amixer -q set " .. channel .. " 2%+")
+        volume("", widget)
+    elseif action == "down" then
+        io.popen("amixer -q set " .. channel .. " 2%-")
+        volume("", widget)
+    elseif action == "mute" then
+        io.popen("amixer -q set " .. channel .. " toggle")
+        volume("", widget)
+    else
+        -- update the widget
+        stat = io.popen("amixer sget " .. channel):read("*all")
+
+
+        if stat:find("off") then
+            vol = "[Vol: M]"
+        else
+            vol = "[Vol: " .. string.format("% 3d", stat:match("(%d?%d?%d)%%")) .. "%]"
+        end
+
+        widget.text = vol
+    end
 end

@@ -87,8 +87,8 @@ mywifimenu = awful.menu({
     items = {
         { "vpn", nil },
         { "cased", nil },
-        { "hrz", nil },
-        { "disconnect", nil }
+        { "hrz", function() awful.util.spawn("gksudo vpnc /etc/vpnc/hrz.conf") end },
+        { "disconnect", function() awful.util.spawn("gksudo vpnc-disconnect") end }
     }
 })
 mywifi = widget({ type = "textbox", name = "mywifi", align = "right" })

@@ -378,6 +378,8 @@ awful.rules.rules = {
                        tag = tags[display][5] } },
     { rule = { class = "Firefox" },
         properties = { tag = tags[display][2] } },
+    { rule = { class = "opera" },
+        properties = { tag = tags[display][2] } },
     { rule = { class = "Chromium" },
         properties = { tag = tags[display][2] } },
     { rule = { class = "Eclipse" },

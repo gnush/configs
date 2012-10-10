@@ -19,8 +19,10 @@ terminal = "urxvtc"
 editor = os.getenv("EDITOR") or "vim"
 editor_cmd = terminal .. " -e " .. editor
 
--- some vars
-local hostname = io.popen("cat /proc/sys/kernel/hostname")
+-- get the hostname
+local fhostname = io.popen("cat /proc/sys/kernel/hostname")
+local hostname = fhostname:read()
+fhostname:close()
 
 -- Default modkey.
 -- Usually, Mod4 is the key with a logo between Control and Alt.
@@ -80,7 +82,19 @@ mytextclock = awful.widget.textclock({ align = "right" })
 
 --Create battery, sound and wifi widget
 mybatmon = widget({ type = "textbox", name = "mybatmon", align = "right"})
+
+mywifimenu = awful.menu({
+    items = {
+        { "vpn", nil },
+        { "cased", nil },
+        { "hrz", nil },
+        { "disconnect", nil }
+    }
+})
 mywifi = widget({ type = "textbox", name = "mywifi", align = "right" })
+mywifi:buttons(awful.util.table.join(
+    awful.button({}, 1, function() mywifimenu:toggle() end)
+))
 
 myvolman = widget({ type = "textbox", name = "myvolman", align = "right" })
 myvolman:buttons(awful.util.table.join(
@@ -173,7 +187,7 @@ for s = 1, screen.count() do
     mywibox[s].widgets = {
         {
            -- mylauncher, --disables the menu icon in the titlebar
-           -- dmenu makes it useless 
+                          -- dmenu makes it useless 
             mytaglist[s],
             mypromptbox[s],
             layout = awful.widget.layout.horizontal.leftright
@@ -182,7 +196,8 @@ for s = 1, screen.count() do
         mytextclock,
         hostname == "eee" and mybatmon or nil,
         --mybuttons,
-        myvolman,
+        mytest,
+        hostname == "zuiop" and myvolman or nil,
         mywifi,
         s == 1 and mysystray or nil,
         mytasklist[s],

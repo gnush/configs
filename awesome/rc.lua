@@ -397,6 +397,8 @@ awful.rules.rules = {
         properties = { tag = tags[display][2] } },
     { rule = { class = "Chromium" },
         properties = { tag = tags[display][2] } },
+    { rule = { class = "Mail" },
+        properties = { tag = tags[display][5] } },
     { rule = { class = "Eclipse" },
         properties = { tag = tags[display][4] } },
     { rule = { class = "Vlc" },

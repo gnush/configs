@@ -85,10 +85,11 @@ mybatmon = widget({ type = "textbox", name = "mybatmon", align = "right"})
 
 mywifimenu = awful.menu({
     items = {
+        { "wicd", function() awful.util.spawn("urxvtc -e wicd-curses") end },
         { "vpn", nil },
-        { "cased", nil },
-        { "hrz", function() awful.util.spawn("gksudo vpnc /etc/vpnc/hrz.conf") end },
-        { "disconnect", function() awful.util.spawn("gksudo vpnc-disconnect") end }
+        { "  cased", nil },
+        { "  hrz", function() awful.util.spawn("gksudo vpnc /etc/vpnc/hrz.conf") end },
+        { "  disconnect", function() awful.util.spawn("gksudo vpnc-disconnect") end }
     }
 })
 mywifi = widget({ type = "textbox", name = "mywifi", align = "right" })
@@ -293,7 +294,8 @@ globalkeys = awful.util.table.join(
               end),
     awful.key({ }, "XF86AudioRaiseVolume",    function () volume("up", myvolman) end),
     awful.key({ }, "XF86AudioLowerVolume",    function () volume("down", myvolman) end),
-    awful.key({ }, "XF86AudioMute",           function () volume("mute", myvolman) end)
+    awful.key({ }, "XF86AudioMute",           function () volume("mute", myvolman) end),
+    awful.key({ }, "XF86WWW",                 function () awful.util.spawn("gksudo pm-suspend") end)
 )
 
 clientkeys = awful.util.table.join(
@@ -364,9 +366,11 @@ root.keys(globalkeys)
 
 -- on laptops, use the extra plugged display
 if hostname == "eee" then
-    display = screen.count()
+    display1 = 1
+    display2 = screen.count()
 else
-    display = 1
+    display1 = 2
+    display2 = 1
 end
 
 awful.rules.rules = {
@@ -390,19 +394,21 @@ awful.rules.rules = {
         properties = { floating = true } },
     { rule = { class = "feh" },
         properties = { tiling = true,
-                       tag = tags[display][5] } },
+                       tag = tags[display2][5] } },
     { rule = { class = "Firefox" },
-        properties = { tag = tags[display][2] } },
+        properties = { tag = tags[display2][2] } },
     { rule = { class = "Opera" },
-        properties = { tag = tags[display][2] } },
+        properties = { tag = tags[display2][2] } },
     { rule = { class = "Chromium" },
-        properties = { tag = tags[display][2] } },
-    { rule = { class = "Mail" },
-        properties = { tag = tags[display][5] } },
+        properties = { tag = tags[display2][2] } },
+    { rule = { class = "Thunderbird" },
+        properties = { tag = tags[display1][5] } },
     { rule = { class = "Eclipse" },
-        properties = { tag = tags[display][4] } },
+        properties = { tag = tags[display2][4] } },
     { rule = { class = "Vlc" },
-        properties = { tag = tags[display][5] } }
+        properties = { tag = tags[display2][5] } },
+    { rule = { class = "org-spoutcraft-launcher-Main" },
+        properties = { tag = tags[display2][5] } }
 }
 -- }}}
 

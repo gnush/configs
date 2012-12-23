@@ -188,7 +188,11 @@ for s = 1, screen.count() do
     mywibox[s].widgets = {
         {
            -- mylauncher, --disables the menu icon in the titlebar
+<<<<<<< HEAD
                           -- dmenu makes it useless
+=======
+                          -- dmenu makes it useless 
+>>>>>>> 750b442a8342dd9c95df737377b2f3a5639f9077
             mytaglist[s],
             mypromptbox[s],
             layout = awful.widget.layout.horizontal.leftright
@@ -369,8 +373,13 @@ if hostname == "eee" then
     display1 = 1
     display2 = screen.count()
 else
+<<<<<<< HEAD
     display1 = 1
     display2 = 2
+=======
+    display1 = 2
+    display2 = 1
+>>>>>>> 750b442a8342dd9c95df737377b2f3a5639f9077
 end
 
 awful.rules.rules = {
@@ -403,8 +412,11 @@ awful.rules.rules = {
         properties = { tag = tags[display2][2] } },
     { rule = { class = "Thunderbird" },
         properties = { tag = tags[display1][5] } },
+<<<<<<< HEAD
     { rule = { class = "Pidgin" },
         properties = { tag = tags[display1][3] } },
+=======
+>>>>>>> 750b442a8342dd9c95df737377b2f3a5639f9077
     { rule = { class = "Eclipse" },
         properties = { tag = tags[display2][4] } },
     { rule = { class = "Vlc" },

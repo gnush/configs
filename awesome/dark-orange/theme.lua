@@ -11,29 +11,26 @@
 
 -- {{{ Main
 theme = {}
--- i use .xinitrc to set up a wallpaper, so this is not necessary
---theme.wallpaper_cmd = { "awsetbg /..." }
+-- theme.wallpaper = "/usr/share/awesome/themes/zenburn/zenburn-background.png"
 -- }}}
--- nasty fix for a bug in awesome 3.4.11
--- see http://awesome.naquadah.org/wiki/Awesome_3.3_to_3.4 for additional information about
-theme.wallpaper_cmd = { 42 }
 
 -- {{{ Styles
 theme.font      = "sans 8"
 
 -- {{{ Colors
-theme.fg_normal = "#f0dfaf"
-theme.fg_focus  = "#f4bf07"
-theme.fg_urgent = "#ff0000"
-theme.bg_normal = "#1e2320"
-theme.bg_focus  = "#1e2320"
-theme.bg_urgent = "#1e2320"
+theme.fg_normal = "#F0DFAF"
+theme.fg_focus  = "#F4BF07"
+theme.fg_urgent = "#DD0000"
+theme.bg_normal = "#1E2320"
+theme.bg_focus  = "#1E2320"
+theme.bg_urgent = "#1E2320"
+theme.bg_systray = theme.bg_normal
 -- }}}
 
 -- {{{ Borders
-theme.border_width  = "1"
-theme.border_normal = "#1e2320"
-theme.border_focus  = "#f4bf07"
+theme.border_width  = 1
+theme.border_normal = "#1E2320"
+theme.border_focus  = "#F4BF07"
 theme.border_marked = "#CC9393"
 -- }}}
 
@@ -72,12 +69,12 @@ theme.mouse_finder_color = "#CC9393"
 -- Variables set for theming the menu:
 -- menu_[bg|fg]_[normal|focus]
 -- menu_[border_color|border_width]
-theme.menu_height = "15"
-theme.menu_width  = "100"
+theme.menu_height = 15
+theme.menu_width  = 100
 -- }}}
 
 -- for a global installation use /usr/share/awesome (or whoever you have put it)
-themeDir = awful.util.getdir("config") .. "/themes/dark-orange"
+themeDir = "~/.config/awesome/themes/dark-orange"
 
 -- {{{ Icons
 -- {{{ Taglist

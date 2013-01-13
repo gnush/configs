@@ -220,9 +220,9 @@ for s = 1, screen.count() do
     -- Widgets that are aligned to the right
     local right_layout = wibox.layout.fixed.horizontal()
     if s == 1 then right_layout:add(wibox.widget.systray()) end
+    right_layout:add(mywifi)
     if hostname == "zuiop" then right_layout:add(myvolman) end
     if hostname == "eee" then right_layout:add(mybatmon) end
-    right_layout:add(mywifi)
     right_layout:add(mytextclock)
     right_layout:add(mylayoutbox[s])
 
@@ -547,25 +547,20 @@ function battery_charge()
 end
 
 function wifi()
-    --local flink = io.open("/sys/class/net/wlan0/wireless/link")
-    local flink = nil
+   local out = ""
+   local wlan_present = awful.util.file_readable("/proc/net/wireless")
 
-    --local link = flink:read()
-    --flink:close()
-    local out = ""
-    if flink ~= nil then
-        local link = flink:read()
-        flink:close()
-
-        if tonumber(link) <= 10 then
-            out = "[Wifi: D/C]"
-        else
-            out = "[Wifi: " .. math.floor(tonumber(link) * 100 / 70)  .. "%]"
-        end
-    else
-        out = "[Wifi: N/A]"
-    end
-    return out
+   if wlan_present then
+      local link = awful.util.pread("cat /proc/net/wireless | awk 'NR==3 {print $3}' | sed 's/\\.//g'")
+      if link == "" then
+         out = "[Wifi: D/C]"
+      else
+         out = "[Wifi: " .. math.floor(tonumber(link) * 100 / 70)  .. "%]"
+      end
+   else
+      out = "[Wifi: N/A]"
+   end
+   return out
 end
 
 function volume(action, widget)

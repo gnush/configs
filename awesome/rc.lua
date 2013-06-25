@@ -46,6 +46,9 @@ terminal = "urxvtc"
 editor = os.getenv("EDITOR") or "vim"
 editor_cmd = terminal .. " -e " .. editor
 
+-- the homedir of the user
+home = os.getenv("HOME")  or "/tmp"
+
 -- get the hostname
 local fhostname = io.popen("cat /proc/sys/kernel/hostname")
 local hostname = fhostname:read()
@@ -310,6 +313,7 @@ globalkeys = awful.util.table.join(
     awful.key({modkey }, "p", function()
         awful.util.spawn_with_shell( "exe=`dmenu_run -i -nf '#f0dfaf' -nb '#1e2320' -sf '#f5a400' -sb '#1e2320'` && exec $exe")
     end),
+    awful.key({ }, "Print", function () awful.util.spawn("import -window root " .. home .. "/latestScreen.png") end),
     awful.key({ }, "XF86AudioRaiseVolume",    function () volume("up", myvolman) end),
     awful.key({ }, "XF86AudioLowerVolume",    function () volume("down", myvolman) end),
     awful.key({ }, "XF86AudioMute",           function () volume("mute", myvolman) end),

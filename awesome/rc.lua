@@ -435,7 +435,9 @@ awful.rules.rules = {
     { rule = { class = "Vlc" },
         properties = { tag = tags[display2][5] } },
     { rule = { class = "org-spoutcraft-launcher-Main" },
-        properties = { tag = tags[display2][5] } }
+        properties = { tag = tags[display2][5] } },
+    { rule = { instance = "plugin-container" },
+         properties = { floating = true } }
 }
 -- }}}
 

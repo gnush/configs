@@ -531,6 +531,7 @@ function battery_charge()
             local max = fmax:read()
             local now = fnow:read()
             local sta = fsta:read()
+            fbat:close()
             fmax:close()
             fnow:close()
             fsta:close()
@@ -573,28 +574,32 @@ function volume(action, widget)
     local channel = "Master"
     local stat = ""
     local vol =""
+    local pid = nil
 
     if action == "up" then
-        io.popen("amixer -q set " .. channel .. " 2%+")
+        pid = io.popen("amixer -q set " .. channel .. " 2%+")
         volume("", widget)
+        io.close(pid)
     elseif action == "down" then
-        io.popen("amixer -q set " .. channel .. " 2%-")
+        pid = io.popen("amixer -q set " .. channel .. " 2%-")
         volume("", widget)
+        io.close(pid)
     elseif action == "mute" then
-        io.popen("amixer -q set " .. channel .. " toggle")
+        pid = io.popen("amixer -q set " .. channel .. " toggle")
         volume("", widget)
-    else
-        -- update the widget
-        stat = io.popen("amixer sget " .. channel):read("*all")
-
-
-        if stat:find("off") then
-            vol = "[Vol: M]"
-        else
-            vol = "[Vol: " .. string.format("% 3d", stat:match("(%d?%d?%d)%%")) .. "%]"
-        end
-
-        widget:set_text(vol)
+        io.close(pid)
     end
+    -- update the widget
+    pid = io.popen("amixer sget " .. channel)
+    stat = pid:read("*all")
+    io.close(pid)
+
+    if stat:find("off") then
+       vol = "[Vol: M]"
+    else
+       vol = "[Vol: " .. string.format("% 3d", stat:match("(%d?%d?%d)%%")) .. "%]"
+    end
+
+    widget:set_text(vol)
 end
 -- }}}

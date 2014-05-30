@@ -394,8 +394,8 @@ if hostname == "eee" then
     display1 = 1
     display2 = screen.count()
 else
-    display1 = 1
-    display2 = 2
+    display1 = 2
+    display2 = 1
 end
 
 awful.rules.rules = {

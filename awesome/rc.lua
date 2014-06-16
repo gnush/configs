@@ -222,9 +222,10 @@ for s = 1, screen.count() do
 
     -- Widgets that are aligned to the right
     local right_layout = wibox.layout.fixed.horizontal()
-    if s == 1 then right_layout:add(wibox.widget.systray()) end
+    if hostname == "eee" and s == 1 then right_layout:add(wibox.widget.systray()) end
+    if hostname == "zuiop" and s == 2 then right_layout:add(wibox.widget.systray()) end
     right_layout:add(mywifi)
-    if hostname == "zuiop" then right_layout:add(myvolman) end
+    right_layout:add(myvolman)
     if hostname == "eee" then right_layout:add(mybatmon) end
     right_layout:add(mytextclock)
     right_layout:add(mylayoutbox[s])
@@ -394,7 +395,7 @@ if hostname == "eee" then
     display1 = 1
     display2 = screen.count()
 else
-    display1 = 2
+    display1 = screen.count()
     display2 = 1
 end
 

@@ -11,7 +11,7 @@
 
 -- {{{ Main
 theme = {}
--- theme.wallpaper = "/usr/share/awesome/themes/zenburn/zenburn-background.png"
+theme.wallpaper = "~/bilder/wallpaper/current"
 -- }}}
 
 -- {{{ Styles

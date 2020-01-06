@@ -237,7 +237,7 @@ awful.screen.connect_for_each_screen(function(s)
             wibox.widget.systray(),
             myvolman,
             mynetwork,
-            -- mybatmon, -- TODO: split this between desktop and laptop
+            mybatmon, -- TODO: split this between desktop and laptop
             mytextclock,
             s.mylayoutbox,
         },
@@ -618,9 +618,11 @@ mytimer:start()
 
 -- {{{ some functions
 function battery_charge()
-        local fbat  = io.open("/sys/class/power_supply/BAT0/present")
-        local fmax  = io.open("/sys/class/power_supply/BAT0/charge_full")
-        local fnow  = io.open("/sys/class/power_supply/BAT0/charge_now")
+        local fbat  = io.open("/sys/class/power_supply/BAT0/present") -- TODO: change to file readable, like in net_status
+        --local fmax  = io.open("/sys/class/power_supply/BAT0/charge_full")
+        --local fnow  = io.open("/sys/class/power_supply/BAT0/charge_now")
+        local fmax  = io.open("/sys/class/power_supply/BAT0/energy_full")
+        local fnow  = io.open("/sys/class/power_supply/BAT0/energy_now")
         local fsta  = io.open("/sys/class/power_supply/BAT0/status")
 
         local out   = ""
@@ -649,20 +651,21 @@ function battery_charge()
 end
 
 function net_status(widget)
-    local eth_present = awful.util.file_readable("/sys/class/net/enp6s0/operstate")
-    local wlan_present = awful.util.file_readable("/proc/net/wireless")
+    local path_to_net = "/sys/class/net"
+    local net = io.popen("ls -a " .. path_to_net .. " | grep enp")
 
-    if eth_present then
-        local fstatus = io.open("/sys/class/net/enp6s0/operstate")
+    for eth in net:lines() do
+        local fstatus = io.open(path_to_net .. "/" .. eth .. "/operstate")
         local status = fstatus:read()
         fstatus:close()
-        
+
         if status == "up" then
             widget:set_text("[Eth: UP]")
             return
         end
     end
     
+    local wlan_present = awful.util.file_readable("/proc/net/wireless")
     if wlan_present then
         local link = ""
         awful.spawn.easy_async({"sh", "-c", "cat /proc/net/wireless | awk 'NR==3 {print $3}' | sed 's/\\.//'"},

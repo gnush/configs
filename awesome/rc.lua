@@ -618,20 +618,17 @@ mytimer:start()
 
 -- {{{ some functions
 function battery_charge()
-        local fbat  = io.open("/sys/class/power_supply/BAT0/present") -- TODO: change to file readable, like in net_status
-        --local fmax  = io.open("/sys/class/power_supply/BAT0/charge_full")
-        --local fnow  = io.open("/sys/class/power_supply/BAT0/charge_now")
+        local battery_present = awful.util.file_readable("/sys/class/power_supply/BAT0/present")
         local fmax  = io.open("/sys/class/power_supply/BAT0/energy_full")
         local fnow  = io.open("/sys/class/power_supply/BAT0/energy_now")
         local fsta  = io.open("/sys/class/power_supply/BAT0/status")
 
         local out   = ""
 
-        if fbat ~= nil then
+        if battery_present then
             local max = fmax:read()
             local now = fnow:read()
             local sta = fsta:read()
-            fbat:close()
             fmax:close()
             fnow:close()
             fsta:close()
@@ -644,7 +641,8 @@ function battery_charge()
                 out = "[A/C]"
             end
         else
-            out = "[A/C]"
+            -- out = "[A/C]"
+            out = "" -- if no battery is present and the pc is running it's magic
         end
 
         return out

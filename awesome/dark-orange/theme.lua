@@ -11,7 +11,7 @@
 
 -- {{{ Main
 theme = {}
-theme.wallpaper = "~/bilder/wallpaper/current"
+--theme.wallpaper = "~/bilder/wallpaper/current"
 -- }}}
 
 -- {{{ Styles

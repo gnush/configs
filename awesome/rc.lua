@@ -637,6 +637,8 @@ function battery_charge()
                 out = "[Bat↓ " .. math.floor(tonumber(now) * 100 / tonumber(max)) .. "%]"
             elseif sta:match("Charging") then
                 out = "[Bat↑ " .. math.floor(tonumber(now) * 100 / tonumber(max)) .. "%]"
+            elseif sta:match("Full") then
+                out = "[A/C]"
             else
                 out = "[A/C]"
             end

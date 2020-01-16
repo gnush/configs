@@ -670,7 +670,7 @@ function battery_charge()
             end
         else
             -- out = "[A/C]"
-            out = "" -- if no battery is present and the pc is running it's magic
+            out = "" -- if no battery is present and we're unaware of a power cable and the pc is running it's magic
         end
 
         return out
@@ -685,7 +685,7 @@ function net_status(widget)
         local status = fstatus:read()
         fstatus:close()
 
-        if status == "up" then
+        if status == "up" then -- not 100% accurate as a connection can be up but not have an adress, but close enought.
             widget:set_text("[Eth: UP]")
             return
         end
@@ -706,7 +706,7 @@ function net_status(widget)
     end
 end
 
-function volume(action, widget)
+function volume(action, widget) -- easy_async this?
     local channel = "Master"
     local stat = ""
     local vol =""
@@ -754,6 +754,5 @@ function generate_network_menu()
     
     networkmenu_entry = networkmenu_entry .. "bar"
 
-    return networkmenu --TODO: why doesnt toggle work when returning the menu and overwriting the variable in the button instead
-    --mynetworkmenu = networkmenu
+    return networkmenu
 end

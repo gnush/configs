@@ -48,9 +48,13 @@ editor_cmd = terminal .. " -e " .. editor
 home = os.getenv("HOME") or "/tmp"
 
 -- get the hostname
-local fhostname = io.popen("cat /proc/sys/kernel/hostname")
+--local phostname = io.popen("uname -n") --io.popen("cat /proc/sys/kernel/hostname")
+--local hostname = phostname:read()
+--phostname:close()
+local fhostname = io.open("/proc/sys/kernel/hostname")
 local hostname = fhostname:read()
 fhostname:close()
+
 
 
 -- Default modkey.
@@ -128,9 +132,28 @@ mytextclock = wibox.widget.textclock()
 --Create battery, sound and network widget
 mybatmon = wibox.widget.textbox()
 
+mynetworkmenu = awful.menu({
+    items = {
+        { "Connection Editor", "nm-connection-editor" }
+    },
+    theme = { width = 150 }
+})
+
 mynetwork = wibox.widget.textbox()
 mynetwork:buttons(
-    awful.button({}, 1, function() naughty.notify({text = "lalalalala"}) end)
+    awful.button({}, 1,
+    function()
+        --if mynetworkmenu and mynetworkmenu.wibox.visible then
+        --    mynetworkmenu:hide()
+        --else
+        --    mynetworkmenu = generate_network_menu()
+        --    mynetworkmenu:show()
+        --end
+        if mynetworkmenu and not mynetworkmenu.wibox.visible then
+            mynetworkmenu = generate_network_menu()
+        end
+        mynetworkmenu:toggle()
+    end)
 )
 
 myvolman = wibox.widget.textbox()
@@ -354,7 +377,7 @@ globalkeys = awful.util.table.join(
               {description = "lua execute prompt", group = "awesome"}),
     -- Menubar
     -- awful.key({ modkey }, "p", function() menubar.show() end,
-    --           {description = "show the menubar", group = "launcher"})
+    --           {description = "show the menubar", group = "launcher"}),
     -- i prefer to use dmenu instead
     -- {{ dmenu
     awful.key({modkey }, "p", function()
@@ -670,7 +693,8 @@ function net_status(widget)
     
     local wlan_present = awful.util.file_readable("/proc/net/wireless")
     if wlan_present then
-        local link = ""
+        local link = "" -- TODO: remove this (unused)
+        -- TODO: easy_async_with_shell will call $SHELL -c COMMAND
         awful.spawn.easy_async({"sh", "-c", "cat /proc/net/wireless | awk 'NR==3 {print $3}' | sed 's/\\.//'"},
             function(stdout, stderr, reason, exit_code)
                 if stdout == "" then
@@ -717,3 +741,21 @@ function volume(action, widget)
     widget:set_text(vol)
 end
 
+-- TODO: all the stuff: add nmcli
+-- Generates a menu to interac with NetworkManager
+networkmenu_entry = "bar"
+function generate_network_menu() 
+    local networkmenu = awful.menu({
+        items = {
+            {networkmenu_entry, function() naughty.notify({ text = "foo" }) end},
+            { "Connection Editor", function() awful.spawn.raise_or_spawn("nm-connection-editor", {}) end } -- restores minimized windows and switches to the right tag
+            --{ "Connection Editor", function() awful.spawn.single_instance("nm-connection-editor", {}) end } -- doesnt
+        },
+        theme = { width = 150 } -- TODO: find good value
+    })
+    
+    networkmenu_entry = networkmenu_entry .. "bar"
+
+    return networkmenu --TODO: why doesnt toggle work when returning the menu and overwriting the variable in the button instead
+    --mynetworkmenu = networkmenu
+end

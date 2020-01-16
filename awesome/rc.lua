@@ -678,7 +678,7 @@ end
 
 function net_status(widget)
     local path_to_net = "/sys/class/net"
-    local net = io.popen("ls -a " .. path_to_net .. " | grep enp")
+    local net = io.popen("ls -a " .. path_to_net .. " | grep enp") -- TODO: easy_async?
 
     for eth in net:lines() do
         local fstatus = io.open(path_to_net .. "/" .. eth .. "/operstate")
@@ -693,18 +693,16 @@ function net_status(widget)
     
     local wlan_present = awful.util.file_readable("/proc/net/wireless")
     if wlan_present then
-        local link = "" -- TODO: remove this (unused)
-        -- TODO: easy_async_with_shell will call $SHELL -c COMMAND
-        awful.spawn.easy_async({"sh", "-c", "cat /proc/net/wireless | awk 'NR==3 {print $3}' | sed 's/\\.//'"},
+        awful.spawn.easy_async_with_shell("awk 'NR==3 {printf \"%3.0f\", $3*100/70}' /proc/net/wireless",
             function(stdout, stderr, reason, exit_code)
                 if stdout == "" then
                     widget:set_text("[Wifi: D/C]")
                 else
-                    widget:set_text("[Wifi: " .. math.floor(tonumber(stdout) * 100 / 70)  .. "%]")
+                    widget:set_text("[Wifi: " .. tonumber(stdout) .. "%]")
                 end
             end)
     else
-        widget:set_text("[Wifi: N/A]")
+        widget:set_text("[Wifi: N/A]") -- TODO: change to Eth: Down?
     end
 end
 

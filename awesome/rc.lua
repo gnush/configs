@@ -742,13 +742,30 @@ end
 -- TODO: all the stuff: add nmcli
 -- Generates a menu to interac with NetworkManager
 networkmenu_entry = "bar"
-function generate_network_menu() 
+function generate_network_menu()
+    local menu_entries = {
+        { networkmenu_entry, function() naughty.notify({ text = "foo" }) end},
+        { "Connection Editor", function() awful.spawn.raise_or_spawn("nm-connection-editor", {}) end } -- restores minimized windows and switches to the right tag
+        --{ "Connection Editor", function() awful.spawn.single_instance("nm-connection-editor", {}) end } -- doesnt
+    }
+    -- Foo
+    local eth = {} -- TODO: check if it also works with nil
+    local wifi = {}
+
+--    awful.spawn.easy_async_with_shell("nmcli device | grep 'ethernet.*connected' | awk '{print $1\": \"$4}'",
+--        function(stdout, stderr, reason, exit)
+--            naughty.notify({ text = stdout})
+--        end
+--    )
+    awful.spawn.with_line_callback({"sh", "-c", "nmcli device | grep 'ethernet.*connected' | awk '{print $1\": \"$4}'"}, {
+        stdout = function(line)
+            naughty.notify({ text = line})
+        end
+    })
+
+
     local networkmenu = awful.menu({
-        items = {
-            {networkmenu_entry, function() naughty.notify({ text = "foo" }) end},
-            { "Connection Editor", function() awful.spawn.raise_or_spawn("nm-connection-editor", {}) end } -- restores minimized windows and switches to the right tag
-            --{ "Connection Editor", function() awful.spawn.single_instance("nm-connection-editor", {}) end } -- doesnt
-        },
+        items = menu_entries,
         theme = { width = 150 } -- TODO: find good value
     })
     

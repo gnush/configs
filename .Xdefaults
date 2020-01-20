@@ -4,7 +4,7 @@ Xft.dpi                      : 96
 Xft.antialias                : true
 Xft.hinting                  : full
 
-urxvt.font                   : xft:inconsolata:pixelsize=14,xft:terminus:pixelsize=13,xft:dejavu sans mono:pixelsize=13
+urxvt.font                   : xft:inconsolata:pixelsize=14:style=Semibold,xft:terminus:pixelsize=13,xft:dejavu sans mono:pixelsize=13
 
 ! Colors are from https://wiki.archlinux.org/index.php/Xdefaults#Terminal_colors
 urxvt.foreground             : #d2d2d2
@@ -46,7 +46,7 @@ urxvt.scrollWithBuffer       : false
 urxvt.scrollTtyOutput        : false
 urxvt.secondaryScroll        : true
 urxvt.utmpInhibit            : true
-urxvt.urlLauncher            : firefox
+urxvt.url-launcher           : firefox
 urxvt.matcher.button         : 1
 
 ! Extension that matches URLs

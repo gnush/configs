@@ -744,13 +744,34 @@ end
 local wifi_state = "on" -- on is default value
 function generate_network_menu()
     -- Assumes each line of the argument to be separated by spaces.
-    local function string_pairs_to_table(argument_lines)
+    local function string_pairs_to_table(argument_lines, elem_names)
+        elem_names = elem_names or {"type", "connection"}
+
         local result = {}
 
         for line in argument_lines:gmatch("[^\n]+") do
-            local str = line:gmatch("%S+")
-            result[str(1)] = str(2)
+            local tmp = {}
+            for entry in line:gmatch("%S+") do
+                table.insert(tmp, entry)
+            end
+
+            local result_entry = {}
+            for i,entry in ipairs(tmp) do
+                result_entry[elem_names[i]] = entry
+            end
+
+            -- debug: check if result_entry is filled correctly: (it is)
+            --for i,x in pairs(result_entry) do
+            --    naughty.notify({text = i .. " " .. x})
+            --end
+
+            table.insert(result, result_entry)
         end
+
+        -- debug: check wheter there are correctly many elements in the result table: (there are)
+        --for i,x in ipairs(result) do
+        --    naughty.notify({ text = tostring(i)})
+        --end
 
         return result
     end
@@ -778,12 +799,13 @@ function generate_network_menu()
 
     -- use io. because we want synchronous stuff here
     local pid = io.popen("nmcli device | grep '\\<connected\\>' | awk '{print $2\" \"$4}'")
-    for typ, connection in pairs(string_pairs_to_table(pid:read("*all"))) do
-        if typ == "ethernet" then
-            table.insert(eth, { "Ethernet: " .. connection, noop})
-            table.insert(eth, { "\t↑ disconnect", noop})
-        elseif typ == "wifi" then
-            table.insert(wifi, { connection .. "\t\t[disconnect]", noop }) --, beautiful.awesome_icon }) -- TODO: get signal strength and set some approbiate icon
+    local elem_name = {"type", "connection"}
+    for k,entry in pairs(string_pairs_to_table(pid:read("*all"), elem_name)) do
+        if entry[elem_name[1]] == "ethernet" then
+            table.insert(eth, { "Ethernet: " .. entry[elem_name[2]], noop})
+            table.insert(eth, { "\t↑ disconnect", noop}) -- implement disconnection
+        elseif entry[elem_name[1]] == "wifi" then
+            table.insert(wifi, { entry[elem_name[2]] .. "\t\t[disconnect]", noop }) --, beautiful.awesome_icon }) -- TODO: get signal strength and set some approbiate icon
         else
             -- TODO: what to do with other types?
         end

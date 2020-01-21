@@ -642,6 +642,8 @@ mytimer:connect_signal("timeout",
                     end)
 mytimer:start()
 
+-- todo: add new timer to periodically scan for wifi networks if not connected to one
+
 -- {{{ some functions
 function battery_charge()
         local battery_present = awful.util.file_readable("/sys/class/power_supply/BAT0/present")
@@ -740,30 +742,9 @@ function volume(action, widget) -- easy_async this?
 end
 
 -- Generates a menu to interact with NetworkManager
+local wifi_list = {}
 local wifi_state = "on" -- on is default value
 function generate_network_menu()
-    -- Assumes each line of the argument to be separated by spaces.
-    local function string_pairs_to_table(argument_lines, elem_names)
-        elem_names = elem_names or {"type", "connection"}
-
-        local result = {}
-        for line in argument_lines:gmatch("[^\n]+") do
-            local tmp = {}
-            for entry in line:gmatch("%S+") do
-                table.insert(tmp, entry)
-            end
-
-            local result_entry = {}
-            for i,entry in ipairs(tmp) do
-                result_entry[elem_names[i]] = entry
-            end
-
-            table.insert(result, result_entry)
-        end
-
-        return result
-    end
-
     local noop = function() end
 
     local function disconnect(device)
@@ -809,6 +790,16 @@ function generate_network_menu()
     -- TODO: add wifi scan list (maybe only for those ssids that have a profile)
     -- nmcli device wifi connect eduroam ifname wlp61s0
 
+    awful.spawn.with_line_callback("nmcli device wifi list", {
+        stdout = function(line)
+            naughty.notify({text = line})
+        end
+    })
+
+--    for k,v in pairs(wifi_list) do
+--        naughty.notify({text = v})
+--    end
+
     -- TODO: replace awful.util.table with gears.table in the rest of the conf
     local networkmenu = awful.menu({
         items = gears.table.join(
@@ -820,4 +811,34 @@ function generate_network_menu()
     })
 
     return networkmenu
+end
+
+-- Assumes each line of the argument to be separated by spaces.
+function string_pairs_to_table(argument_lines, elem_names)
+    elem_names = elem_names or {"type", "connection"}
+
+    local result = {}
+    for line in argument_lines:gmatch("[^\n]+") do
+        local tmp = {}
+        for entry in line:gmatch("%S+") do
+            table.insert(tmp, entry)
+        end
+
+        local result_entry = {}
+        for i,entry in ipairs(tmp) do
+            result_entry[elem_names[i]] = entry
+        end
+
+        table.insert(result, result_entry)
+    end
+
+    return result
+end
+
+function wifi_scan()
+    awful.spawn.with_line_callback("nmcli device wifi list", {
+        stdout = function(line)
+            -- naughty.notify({text = line})
+        end
+    })
 end

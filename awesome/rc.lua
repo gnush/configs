@@ -739,8 +739,7 @@ function volume(action, widget) -- easy_async this?
     widget:set_text(vol)
 end
 
--- TODO: all the stuff: add nmcli
--- Generates a menu to interac with NetworkManager
+-- Generates a menu to interact with NetworkManager
 local wifi_state = "on" -- on is default value
 function generate_network_menu()
     -- Assumes each line of the argument to be separated by spaces.
@@ -748,7 +747,6 @@ function generate_network_menu()
         elem_names = elem_names or {"type", "connection"}
 
         local result = {}
-
         for line in argument_lines:gmatch("[^\n]+") do
             local tmp = {}
             for entry in line:gmatch("%S+") do
@@ -768,6 +766,12 @@ function generate_network_menu()
 
     local noop = function() end
 
+    local function disconnect(device)
+        return function()
+            awful.spawn.easy_async("nmcli device disconnect " .. device, noop)
+        end
+    end
+
     local static_entries = {
         { "Connection Editor", function() awful.spawn.raise_or_spawn("nm-connection-editor", {}) end } -- restores minimized windows and switches to the right tag
         --{ "Connection Editor", function() awful.spawn.single_instance("nm-connection-editor", {}) end } -- doesnt
@@ -778,7 +782,7 @@ function generate_network_menu()
             { "Wifi: " .. wifi_state .. "\t\t[toggle]", function()
                                         if wifi_state == "on" then
                                             wifi_state = "off"
-                                            awful.spawn.easy_async("nmcli radio wifi " .. wifi_state, noop) -- TODO: maybe add real callback function to capture exit code to check if command succeeded?
+                                            awful.spawn.easy_async("nmcli radio wifi " .. wifi_state, noop)
                                         elseif wifi_state == "off" then
                                             wifi_state = "on"
                                             awful.spawn.easy_async("nmcli radio wifi " .. wifi_state, noop)
@@ -788,21 +792,22 @@ function generate_network_menu()
     }
 
     -- use io. because we want synchronous stuff here
-    local pid = io.popen("nmcli device | grep '\\<connected\\>' | awk '{print $2\" \"$4}'")
-    local elem_name = {"type", "connection"}
+    local pid = io.popen("nmcli device | grep '\\<connected\\>' | awk '{print $1\" \"$2\" \"$4}'")
+    local elem_name = {"device", "type", "connection"}
     for k,entry in pairs(string_pairs_to_table(pid:read("*all"), elem_name)) do
-        if entry[elem_name[1]] == "ethernet" then
-            table.insert(eth, { "Ethernet: " .. entry[elem_name[2]], noop})
-            table.insert(eth, { "\t↑ disconnect", noop}) -- implement disconnection
-        elseif entry[elem_name[1]] == "wifi" then
-            table.insert(wifi, { entry[elem_name[2]] .. "\t\t[disconnect]", noop }) --, beautiful.awesome_icon }) -- TODO: get signal strength and set some approbiate icon
+        if entry[elem_name[2]] == "ethernet" then
+            table.insert(eth, { "Ethernet: " .. entry[elem_name[3]], noop})
+            table.insert(eth, { "\t↑ disconnect", disconnect(entry[elem_name[1]])}) -- implement disconnection
+        elseif entry[elem_name[2]] == "wifi" then
+            table.insert(wifi, { entry[elem_name[3]] .. "\t\t[disconnect]", disconnect(entry[elem_name[1]]) }) --, beautiful.awesome_icon }) -- TODO: get signal strength and set some approbiate icon
         else
             -- TODO: what to do with other types?
         end
     end
     io.close(pid)
 
-    -- TODO: add wifi scan list
+    -- TODO: add wifi scan list (maybe only for those ssids that have a profile)
+    -- nmcli device wifi connect eduroam ifname wlp61s0
 
     -- TODO: replace awful.util.table with gears.table in the rest of the conf
     local networkmenu = awful.menu({

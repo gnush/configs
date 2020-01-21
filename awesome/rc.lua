@@ -685,7 +685,7 @@ function net_status(widget)
         local status = fstatus:read()
         fstatus:close()
 
-        if status == "up" then -- not 100% accurate as a connection can be up but not have an adress, but close enought.
+        if status == "up" then -- not 100% accurate as a connection can be up but not have an adress, but close enough.
             widget:set_text("[Eth: UP]")
             return
         end
@@ -741,35 +741,63 @@ end
 
 -- TODO: all the stuff: add nmcli
 -- Generates a menu to interac with NetworkManager
-networkmenu_entry = "bar"
+local wifi_state = "on" -- on is default value
 function generate_network_menu()
-    local menu_entries = {
-        { networkmenu_entry, function() naughty.notify({ text = "foo" }) end},
+    local function split(string_arg)
+        local result = {}
+        for x in string.gmatch(string_arg, "%S+") do
+            table.insert(result, x)
+        end
+
+        return result
+    end
+
+    local noop = function() end
+
+    local static_entries = {
         { "Connection Editor", function() awful.spawn.raise_or_spawn("nm-connection-editor", {}) end } -- restores minimized windows and switches to the right tag
         --{ "Connection Editor", function() awful.spawn.single_instance("nm-connection-editor", {}) end } -- doesnt
     }
     -- Foo
-    local eth = {} -- TODO: check if it also works with nil
-    local wifi = {}
+    local eth = {}
+    local wifi = {
+            { "Wifi: " .. wifi_state, function()
+                                        if wifi_state == "on" then
+                                            wifi_state = "off"
+                                            awful.spawn.easy_async_with_shell("nmcli radio wifi " .. wifi_state, noop) -- TODO: maybe add real callback function to capture exit code to check if command succeeded?
+                                        elseif wifi_state == "off" then
+                                            wifi_state = "on"
+                                            awful.spawn.easy_async("nmcli radio wifi " .. wifi_state, noop)
+                                        end
+                                      end
+            }
+    }
 
---    awful.spawn.easy_async_with_shell("nmcli device | grep 'ethernet.*connected' | awk '{print $1\": \"$4}'",
---        function(stdout, stderr, reason, exit)
---            naughty.notify({ text = stdout})
---        end
---    )
-    awful.spawn.with_line_callback({"sh", "-c", "nmcli device | grep 'ethernet.*connected' | awk '{print $1\": \"$4}'"}, {
-        stdout = function(line)
-            naughty.notify({ text = line})
-        end
-    })
+    -- use io. because we want synchronous stuff here
+    local pid = io.popen("nmcli device | grep 'ethernet.*connected' | awk '{print $1\" \"$4}'")
+    for line in pid:lines() do
+        local res = split(line) -- TODO: find better name for this pair
+        table.insert(eth, { "Ethernet: " .. res[2], noop}) -- TODO: don't use two lines to display this? (maybe submenu?)
+        table.insert(eth, { "  … disconnect", noop})
+    end
+    io.close(pid)
 
+    pid = io.popen("nmcli device | grep 'wifi.*\\<connected\\>' | awk '{print $4}'")
+    for line in pid:lines() do
+        table.insert(wifi, { "Wifi: " .. line, noop }) --, beautiful.awesome_icon }) -- TODO: get signal strength and set some approbiate icon
+        table.insert(wifi, { "  … disconnect", noop })
+    end
+    io.close(pid)
 
+    -- TODO: replace awful.util.table with gears.table in the rest of the conf
     local networkmenu = awful.menu({
-        items = menu_entries,
-        theme = { width = 150 } -- TODO: find good value
+        items = gears.table.join(
+            eth,
+            wifi,
+            static_entries
+        ),
+        theme = { width = 175 } -- TODO: find good value or a way to measure it dynamically
     })
-    
-    networkmenu_entry = networkmenu_entry .. "bar"
 
     return networkmenu
 end

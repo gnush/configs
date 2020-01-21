@@ -743,14 +743,13 @@ end
 -- Generates a menu to interac with NetworkManager
 local wifi_state = "on" -- on is default value
 function generate_network_menu()
-    local function string_pair_to_table(argument_lines)
+    -- Assumes each line of the argument to be separated by spaces.
+    local function string_pairs_to_table(argument_lines)
         local result = {}
 
         for line in argument_lines:gmatch("[^\n]+") do
-            --local str = string.gmatch(line, "%S+")
             local str = line:gmatch("%S+")
             result[str(1)] = str(2)
-            --table.insert(result, str(1), str(2))
         end
 
         return result
@@ -768,7 +767,7 @@ function generate_network_menu()
             { "Wifi: " .. wifi_state .. "\t\t[toggle]", function()
                                         if wifi_state == "on" then
                                             wifi_state = "off"
-                                            awful.spawn.easy_async_with_shell("nmcli radio wifi " .. wifi_state, noop) -- TODO: maybe add real callback function to capture exit code to check if command succeeded?
+                                            awful.spawn.easy_async("nmcli radio wifi " .. wifi_state, noop) -- TODO: maybe add real callback function to capture exit code to check if command succeeded?
                                         elseif wifi_state == "off" then
                                             wifi_state = "on"
                                             awful.spawn.easy_async("nmcli radio wifi " .. wifi_state, noop)
@@ -778,9 +777,9 @@ function generate_network_menu()
     }
 
     -- use io. because we want synchronous stuff here
-    local pid = io.popen("nmcli device | grep '\\<connected\\>' | awk '{print $2\" \"$4}'") 
-    for typ, connection in pairs(string_pair_to_table(pid:read("*all"))) do
-        if typ == "ethernet" then        
+    local pid = io.popen("nmcli device | grep '\\<connected\\>' | awk '{print $2\" \"$4}'")
+    for typ, connection in pairs(string_pairs_to_table(pid:read("*all"))) do
+        if typ == "ethernet" then
             table.insert(eth, { "Ethernet: " .. connection, noop})
             table.insert(eth, { "\t↑ disconnect", noop})
         elseif typ == "wifi" then

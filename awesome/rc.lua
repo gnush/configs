@@ -760,18 +760,8 @@ function generate_network_menu()
                 result_entry[elem_names[i]] = entry
             end
 
-            -- debug: check if result_entry is filled correctly: (it is)
-            --for i,x in pairs(result_entry) do
-            --    naughty.notify({text = i .. " " .. x})
-            --end
-
             table.insert(result, result_entry)
         end
-
-        -- debug: check wheter there are correctly many elements in the result table: (there are)
-        --for i,x in ipairs(result) do
-        --    naughty.notify({ text = tostring(i)})
-        --end
 
         return result
     end

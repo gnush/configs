@@ -743,10 +743,14 @@ end
 -- Generates a menu to interac with NetworkManager
 local wifi_state = "on" -- on is default value
 function generate_network_menu()
-    local function split(string_arg)
+    local function string_pair_to_table(argument_lines)
         local result = {}
-        for x in string.gmatch(string_arg, "%S+") do
-            table.insert(result, x)
+
+        for line in argument_lines:gmatch("[^\n]+") do
+            --local str = string.gmatch(line, "%S+")
+            local str = line:gmatch("%S+")
+            result[str(1)] = str(2)
+            --table.insert(result, str(1), str(2))
         end
 
         return result
@@ -758,10 +762,10 @@ function generate_network_menu()
         { "Connection Editor", function() awful.spawn.raise_or_spawn("nm-connection-editor", {}) end } -- restores minimized windows and switches to the right tag
         --{ "Connection Editor", function() awful.spawn.single_instance("nm-connection-editor", {}) end } -- doesnt
     }
-    -- Foo
+    
     local eth = {}
     local wifi = {
-            { "Wifi: " .. wifi_state, function()
+            { "Wifi: " .. wifi_state .. "\t\t[toggle]", function()
                                         if wifi_state == "on" then
                                             wifi_state = "off"
                                             awful.spawn.easy_async_with_shell("nmcli radio wifi " .. wifi_state, noop) -- TODO: maybe add real callback function to capture exit code to check if command succeeded?
@@ -774,20 +778,20 @@ function generate_network_menu()
     }
 
     -- use io. because we want synchronous stuff here
-    local pid = io.popen("nmcli device | grep 'ethernet.*connected' | awk '{print $1\" \"$4}'")
-    for line in pid:lines() do
-        local res = split(line) -- TODO: find better name for this pair
-        table.insert(eth, { "Ethernet: " .. res[2], noop}) -- TODO: don't use two lines to display this? (maybe submenu?)
-        table.insert(eth, { "  … disconnect", noop})
+    local pid = io.popen("nmcli device | grep '\\<connected\\>' | awk '{print $2\" \"$4}'") 
+    for typ, connection in pairs(string_pair_to_table(pid:read("*all"))) do
+        if typ == "ethernet" then        
+            table.insert(eth, { "Ethernet: " .. connection, noop})
+            table.insert(eth, { "\t↑ disconnect", noop})
+        elseif typ == "wifi" then
+            table.insert(wifi, { connection .. "\t\t[disconnect]", noop }) --, beautiful.awesome_icon }) -- TODO: get signal strength and set some approbiate icon
+        else
+            -- TODO: what to do with other types?
+        end
     end
     io.close(pid)
 
-    pid = io.popen("nmcli device | grep 'wifi.*\\<connected\\>' | awk '{print $4}'")
-    for line in pid:lines() do
-        table.insert(wifi, { "Wifi: " .. line, noop }) --, beautiful.awesome_icon }) -- TODO: get signal strength and set some approbiate icon
-        table.insert(wifi, { "  … disconnect", noop })
-    end
-    io.close(pid)
+    -- TODO: add wifi scan list
 
     -- TODO: replace awful.util.table with gears.table in the rest of the conf
     local networkmenu = awful.menu({

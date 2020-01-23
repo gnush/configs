@@ -774,13 +774,12 @@ function generate_network_menu()
 
     -- use io. because we want synchronous stuff here
     local pid = io.popen("nmcli device | grep '\\<connected\\>' | awk '{print $1\" \"$2\" \"$4}'")
-    local elem_name = {"device", "type", "connection"}
-    for k,entry in pairs(string_to_associative_table(pid:read("*all"), elem_name)) do
-        if entry[elem_name[2]] == "ethernet" then
-            table.insert(eth, { "Ethernet: " .. entry[elem_name[3]], noop})
-            table.insert(eth, { "\t↑ disconnect", disconnect(entry[elem_name[1]])}) -- implement disconnection
-        elseif entry[elem_name[2]] == "wifi" then
-            table.insert(wifi, { entry[elem_name[3]] .. "\t\t[disconnect]", disconnect(entry[elem_name[1]]) }) --, beautiful.awesome_icon }) -- TODO: get signal strength and set some approbiate icon
+    for k,entry in pairs(string_to_table(pid:read("*all"), elem_name)) do
+        if entry[2] == "ethernet" then
+            table.insert(eth, { "Ethernet: " .. entry[3], noop})
+            table.insert(eth, { "\t↑ disconnect", disconnect(entry[1])})
+        elseif entry[2] == "wifi" then
+            table.insert(wifi, { entry[3] .. "\t\t[disconnect]", disconnect(entry[1]) }) --, beautiful.awesome_icon }) -- TODO: get signal strength and set some approbiate icon
         else
             -- TODO: what to do with other types?
         end
@@ -789,13 +788,6 @@ function generate_network_menu()
 
     -- TODO: add wifi scan list (maybe only for those ssids that have a profile)
     -- nmcli device wifi connect eduroam ifname wlp61s0
-
-    --awful.spawn.with_line_callback("nmcli device wifi list", {
-    --    stdout = function(line)
-    --        --naughty.notify({text = line})
-    --    end
-    --})
-    --
     --wifi_scan()
 
 --    for k,v in pairs(wifi_list) do
@@ -816,6 +808,7 @@ function generate_network_menu()
 end
 
 -- Assumes each line of the argument to be separated by spaces.
+-- Returns A table with one entry per input line.
 function string_to_table(argument_lines)
     local result = {}
     for line in argument_lines:gmatch("[^\n]+") do
@@ -826,16 +819,12 @@ function string_to_table(argument_lines)
 end
 
 -- Assumes each line of the argument to be separated by spaces.
+-- Returns A table, where elem_names specifies the names associated with the different words per line.
 function string_to_associative_table(argument_lines, elem_names)
     elem_names = elem_names or {"type", "connection"}
 
     local result = {}
     for line in argument_lines:gmatch("[^\n]+") do
-        --local tmp = {}
-        --for entry in line:gmatch("%S+") do
-        --    table.insert(tmp, entry)
-        --end
-
         local result_entry = {}
         for i,entry in ipairs(string_split_whitespace(line)) do
             result_entry[elem_names[i]] = entry

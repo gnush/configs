@@ -790,11 +790,13 @@ function generate_network_menu()
     -- TODO: add wifi scan list (maybe only for those ssids that have a profile)
     -- nmcli device wifi connect eduroam ifname wlp61s0
 
-    awful.spawn.with_line_callback("nmcli device wifi list", {
-        stdout = function(line)
-            naughty.notify({text = line})
-        end
-    })
+    --awful.spawn.with_line_callback("nmcli device wifi list", {
+    --    stdout = function(line)
+    --        --naughty.notify({text = line})
+    --    end
+    --})
+    --
+    --wifi_scan()
 
 --    for k,v in pairs(wifi_list) do
 --        naughty.notify({text = v})
@@ -819,13 +821,13 @@ function string_pairs_to_table(argument_lines, elem_names)
 
     local result = {}
     for line in argument_lines:gmatch("[^\n]+") do
-        local tmp = {}
-        for entry in line:gmatch("%S+") do
-            table.insert(tmp, entry)
-        end
+        --local tmp = {}
+        --for entry in line:gmatch("%S+") do
+        --    table.insert(tmp, entry)
+        --end
 
         local result_entry = {}
-        for i,entry in ipairs(tmp) do
+        for i,entry in ipairs(string_split_whitespace(line)) do
             result_entry[elem_names[i]] = entry
         end
 
@@ -835,10 +837,28 @@ function string_pairs_to_table(argument_lines, elem_names)
     return result
 end
 
+function string_split_whitespace(input)
+    local result = {}
+
+    for word in input:gmatch("%S+") do
+        table.insert(result, word)
+    end
+
+    return result
+end
+
 function wifi_scan()
     awful.spawn.with_line_callback("nmcli device wifi list", {
         stdout = function(line)
-            -- naughty.notify({text = line})
+            local words = string_split_whitespace(line)
+
+            if (words[1] == "IN-USE") then
+                -- header line → ignore
+            elseif (words[1] == "*") then
+                -- connected network
+            else
+                -- not connectet
+            end
         end
     })
 end

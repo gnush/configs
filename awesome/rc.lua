@@ -775,7 +775,7 @@ function generate_network_menu()
     -- use io. because we want synchronous stuff here
     local pid = io.popen("nmcli device | grep '\\<connected\\>' | awk '{print $1\" \"$2\" \"$4}'")
     local elem_name = {"device", "type", "connection"}
-    for k,entry in pairs(string_pairs_to_table(pid:read("*all"), elem_name)) do
+    for k,entry in pairs(string_to_associative_table(pid:read("*all"), elem_name)) do
         if entry[elem_name[2]] == "ethernet" then
             table.insert(eth, { "Ethernet: " .. entry[elem_name[3]], noop})
             table.insert(eth, { "\t↑ disconnect", disconnect(entry[elem_name[1]])}) -- implement disconnection
@@ -816,7 +816,17 @@ function generate_network_menu()
 end
 
 -- Assumes each line of the argument to be separated by spaces.
-function string_pairs_to_table(argument_lines, elem_names)
+function string_to_table(argument_lines)
+    local result = {}
+    for line in argument_lines:gmatch("[^\n]+") do
+        table.insert(result, string_split_whitespace(line))
+    end
+
+    return result
+end
+
+-- Assumes each line of the argument to be separated by spaces.
+function string_to_associative_table(argument_lines, elem_names)
     elem_names = elem_names or {"type", "connection"}
 
     local result = {}

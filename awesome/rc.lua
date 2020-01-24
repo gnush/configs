@@ -632,18 +632,6 @@ client.connect_signal("focus", function(c) c.border_color = beautiful.border_foc
 client.connect_signal("unfocus", function(c) c.border_color = beautiful.border_normal end)
 -- }}}
 
--- timer
-mytimer = timer({ timeout = 2 })
-mytimer:connect_signal("timeout",
-                    function()
-                        mybatmon:set_text(battery_charge())
-                        net_status(mynetwork)
-                        volume("update", myvolman)
-                    end)
-mytimer:start()
-
--- todo: add new timer to periodically scan for wifi networks if not connected to one
-
 -- {{{ some functions
 function battery_charge()
         local battery_present = awful.util.file_readable("/sys/class/power_supply/BAT0/present")
@@ -742,9 +730,8 @@ function volume(action, widget) -- easy_async this?
 end
 
 -- Generates a menu to interact with NetworkManager
-local wifi_list = {}
 local wifi_state = "on" -- on is default value
-function generate_network_menu()
+function generate_network_menu(widget)
     local noop = function() end
 
     local function disconnect(device)
@@ -786,13 +773,17 @@ function generate_network_menu()
     end
     io.close(pid)
 
-    -- TODO: add wifi scan list (maybe only for those ssids that have a profile)
+
+    -- add wifi scan list (maybe only for those ssids that have a profile)
+    local scan_list = {}
+    for k,wifi_net in pairs(wifi_list) do
+        table.insert(scan_list, {wifi_net.bars .. " " .. wifi_net.ssid, noop}) -- TODO: connecting to ssid, also bars to icon
+    end
+    table.insert(wifi, {"Scan List …", scan_list})
+
+
     -- nmcli device wifi connect eduroam ifname wlp61s0
     --wifi_scan()
-
---    for k,v in pairs(wifi_list) do
---        naughty.notify({text = v})
---    end
 
     -- TODO: replace awful.util.table with gears.table in the rest of the conf
     local networkmenu = awful.menu({
@@ -801,7 +792,7 @@ function generate_network_menu()
             wifi,
             static_entries
         ),
-        theme = { width = 175 } -- TODO: find good value or a way to measure it dynamically
+        theme = { width = 170 } -- TODO: find good value or a way to measure it dynamically
     })
 
     return networkmenu
@@ -846,18 +837,64 @@ function string_split_whitespace(input)
     return result
 end
 
-function wifi_scan()
+wifi_list = {}
+function wifi_scan() -- TODO: ssids with spaces in the name break things
     awful.spawn.with_line_callback("nmcli device wifi list", {
         stdout = function(line)
             local words = string_split_whitespace(line)
 
+            local ssid = ""
+            local rate = ""
+            local bars = ""
+
             if (words[1] == "IN-USE") then
                 -- header line → ignore
+                return
             elseif (words[1] == "*") then
                 -- connected network
+                ssid = words[3]
+                rate = words[6]
+                bars = words[9]
             else
                 -- not connectet
+                ssid = words[2]
+                rate = words[5]
+                bars = words[8]
             end
+
+            local result = {}
+            result["ssid"] = ssid
+            result["rate"] = rate
+            result["bars"] = bars
+
+            table.insert(wifi_list, result)
         end
     })
 end
+
+-- timers at the end, else call_now doesnt work because stuff is not initialized yet
+-- Update the widgets every five seconds.
+mywidgetupdatetimer = gears.timer({
+    timeout = 5,
+    call_now = true,
+    autostart = true,
+    callback = function()      
+        mybatmon:set_text(battery_charge())
+        net_status(mynetwork)
+        volume("update", myvolman)
+    end
+})
+
+-- todo: add new timer to periodically scan for wifi networks if not connected to one
+-- Scan for wifi every 120 seconds TODO, if not connected to a wifi
+mywifiscantimer = gears.timer({
+    timeout = 120,
+    call_now = true,
+    autostart = true,
+    callback = function()
+        -- TODO: maybe change this to a more "functional" approach.
+        -- e.g. in wifi_scan() use awful.spawn.easy_async instead of .with_line_callback()
+        wifi_list = {} -- clear the wifi list
+        wifi_scan() -- add new scan to wifi list
+    end
+})

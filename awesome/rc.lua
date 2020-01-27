@@ -683,7 +683,7 @@ function net_status(widget)
     
     local wlan_present = awful.util.file_readable("/proc/net/wireless")
     if wlan_present then
-        awful.spawn.easy_async_with_shell("awk 'NR==3 {printf \"%3.0f\", $3*100/70}' /proc/net/wireless",
+        awful.spawn.easy_async("awk 'NR==3 {printf \"%3.0f\", $3*100/70}' /proc/net/wireless",
             function(stdout, stderr, reason, exit_code)
                 if stdout == "" then
                     widget:set_text("[Wifi: D/C]")
@@ -730,7 +730,6 @@ function volume(action, widget) -- easy_async this?
 end
 
 -- Generates a menu to interact with NetworkManager
-local wifi_state = "on" -- on is default value
 function generate_network_menu(widget)
     local noop = function() end
 
@@ -740,10 +739,30 @@ function generate_network_menu(widget)
         end
     end
 
+    local function connect_eth(device)
+        return function()
+            awful.spawn.easy_async("nmcli device connect " .. device, noop) -- TODO: callback → notify about successfull connection, also add this to connect_wifi
+        end
+    end
+
+    local function connect_wifi(ssid, device)
+        return function()
+            if device then
+                awful.spawn.easy_async("nmcli device wifi connect " .. ssid .. " ifname " .. device, noop)
+            else
+                awful.spawn.easy_async("nmcli device wifi connect " .. ssid, noop)
+            end
+        end
+    end
+
     local static_entries = {
         { "Connection Editor", function() awful.spawn.raise_or_spawn("nm-connection-editor", {}) end } -- restores minimized windows and switches to the right tag
         --{ "Connection Editor", function() awful.spawn.single_instance("nm-connection-editor", {}) end } -- doesnt
     }
+
+    local pid = io.popen("nmcli radio wifi")
+    local wifi_state = pid:read() == "enabled" and "on" or "off"
+    io.close(pid)
     
     local eth = {}
     local wifi = {
@@ -760,13 +779,33 @@ function generate_network_menu(widget)
     }
 
     -- use io. because we want synchronous stuff here
-    local pid = io.popen("nmcli device | grep '\\<connected\\>' | awk '{print $1\" \"$2\" \"$4}'")
+    pid = io.popen("nmcli device | tail -n +2")
     for k,entry in pairs(string_to_table(pid:read("*all"), elem_name)) do
-        if entry[2] == "ethernet" then
-            table.insert(eth, { "Ethernet: " .. entry[3], noop})
+        if entry[2] == "ethernet" and entry[3] == "connected" then
+            table.insert(eth, { "Ethernet: " .. entry[4], noop})
             table.insert(eth, { "\t↑ disconnect", disconnect(entry[1])})
-        elseif entry[2] == "wifi" then
-            table.insert(wifi, { entry[3] .. "\t\t[disconnect]", disconnect(entry[1]) }) --, beautiful.awesome_icon }) -- TODO: get signal strength and set some approbiate icon
+        elseif entry[2] == "ethernet" and entry[3] == "disconnected" then
+            table.insert(eth, { "Connect " .. entry[1], connect_eth(entry[1]) })
+        elseif entry[2] == "wifi" and entry[3] == "connected" then
+    local wlan_present = awful.util.file_readable("/proc/net/wireless")
+            local ICON_PATH = "/usr/share/icons/hicolor/22x22/apps/"
+            local icon = ICON_PATH .. "nm-signal-00.png"
+            if awful.util.file_readable("/proc/net/wireless") then
+                local pWireless = io.popen("awk 'NR==3 {printf \"%3.0f\", $3*100/70}' /proc/net/wireless") -- TODO: replace through bars_to_nm_icon if we keep background scanning?
+                local signal_strength = tonumber(pWireless:read())
+                io.close(pWireless)
+
+                if signal_strength > 20 and signal_strength <= 45 then
+                    icon = ICON_PATH .. "nm-signal-25.png"
+                elseif signal_strength > 45 and signal_strength <= 70 then
+                    icon = ICON_PATH .. "nm-signal-50.png"
+                elseif signal_strength > 70 and signal_strength <= 95 then
+                    icon = ICON_PATH .. "nm-signal-75.png"
+                else
+                    icon = ICON_PATH .. "nm-signal-100.png"
+                end
+            end
+            table.insert(wifi, { entry[4] .. "\t\t[disconnect]", disconnect(entry[1]), icon })
         else
             -- TODO: what to do with other types?
         end
@@ -777,13 +816,9 @@ function generate_network_menu(widget)
     -- add wifi scan list (maybe only for those ssids that have a profile)
     local scan_list = {}
     for k,wifi_net in pairs(wifi_list) do
-        table.insert(scan_list, {wifi_net.bars .. " " .. wifi_net.ssid, noop}) -- TODO: connecting to ssid, also bars to icon
+        table.insert(scan_list, { " " .. wifi_net.ssid, connect_wifi(wifi_net.ssid), bars_to_nm_icon(wifi_net.bars) })
     end
-    table.insert(wifi, {"Scan List …", scan_list})
-
-
-    -- nmcli device wifi connect eduroam ifname wlp61s0
-    --wifi_scan()
+    table.insert(wifi, {"Scan List …", scan_list })
 
     -- TODO: replace awful.util.table with gears.table in the rest of the conf
     local networkmenu = awful.menu({
@@ -792,7 +827,7 @@ function generate_network_menu(widget)
             wifi,
             static_entries
         ),
-        theme = { width = 170 } -- TODO: find good value or a way to measure it dynamically
+        theme = { width = 175 } -- TODO: find a way to measure it dynamically
     })
 
     return networkmenu
@@ -872,6 +907,22 @@ function wifi_scan() -- TODO: ssids with spaces in the name break things
     })
 end
 
+-- Bars are expected to be formatted like the output from 'nmcli device wifi list'
+function bars_to_nm_icon(bars)
+    local ICON_PATH = "/usr/share/icons/hicolor/22x22/apps/"
+    if     bars == "____" then
+        return ICON_PATH .. "nm-signal-00.png"
+    elseif bars == "▂___" then
+        return ICON_PATH .. "nm-signal-25.png"
+    elseif bars == "▂▄__" then
+        return ICON_PATH .. "nm-signal-50.png"
+    elseif bars == "▂▄▆_" then
+        return ICON_PATH .. "nm-signal-75.png"
+    elseif bars == "▂▄▆█" then
+        return ICON_PATH .. "nm-signal-100.png"
+    end
+end
+
 -- timers at the end, else call_now doesnt work because stuff is not initialized yet
 -- Update the widgets every five seconds.
 mywidgetupdatetimer = gears.timer({
@@ -885,10 +936,9 @@ mywidgetupdatetimer = gears.timer({
     end
 })
 
--- todo: add new timer to periodically scan for wifi networks if not connected to one
--- Scan for wifi every 120 seconds TODO, if not connected to a wifi
+-- Scan for wifi every 5 minutes TODO, if not connected to a wifi
 mywifiscantimer = gears.timer({
-    timeout = 120,
+    timeout = 300,
     call_now = true,
     autostart = true,
     callback = function()

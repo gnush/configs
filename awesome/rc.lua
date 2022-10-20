@@ -552,8 +552,8 @@ awful.rules.rules = {
       properties = { tiling = true} },
     { rule = {class = "Pidgin"},
       properties = { screen = screen1, tag = "chat"} },
-    { rule = {class = "Thunderbird"},
-      properties = { screen = screen1, tag = "misc"} },
+    --{ rule = {class = "Thunderbird"}, -- TODO: doesnt work anymore. update with new class or sth. same for Firefox
+    --  properties = { screen = screen1, tag = "misc"} },
     { rule_any = {class = {"Firefox", "Opera", "Chromium"} },
       properties = { screen = screen2, tag = "www"} },
     { rule = {class = "Eclipse"},

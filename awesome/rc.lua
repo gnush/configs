@@ -720,10 +720,12 @@ function volume(action, widget) -- easy_async this?
     stat = pid:read("*all")
     io.close(pid)
 
-    if stat:find("off") then
-       vol = "[Vol: M]"
+    if stat == nil or stat == "" then
+        vol = "[Vol: ?]"
+    elseif stat:find("off") then
+        vol = "[Vol: M]"
     else
-       vol = "[Vol: " .. string.format("% 3d", stat:match("(%d?%d?%d)%%")) .. "%]"
+        vol = "[Vol: " .. string.format("% 3d", stat:match("(%d?%d?%d)%%")) .. "%]"
     end
 
     widget:set_text(vol)

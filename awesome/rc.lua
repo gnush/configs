@@ -503,13 +503,18 @@ awful.rules.rules = {
                      buttons = clientbuttons,
                      screen = awful.screen.preferred,
                      placement = awful.placement.no_overlap+awful.placement.no_offscreen,
-                     -- disable hinting
-                     size_hints_honor = false,
+                     -- honor size hints (disabled per client below)
+                     -- globally disable if many applications show problems with it (not filling the entire screen, leaving gaps right+bottom)
+                     size_hints_honor = true,
                      -- no per default maximized windows
                      maximized_vertical   = false,
                      maximized_horizontal = false
      }
     },
+
+    -- urxvt: ignore size hints, fill the tile (no borders at cell remainder)
+    { rule = { class = "URxvt" },
+      properties = { size_hints_honor = false } },
 
     -- Floating clients.
     { rule_any = {
